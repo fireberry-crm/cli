@@ -2,13 +2,6 @@
 
 Minimal demo CLI with `init` command.
 
-## Setup
-
-```bash
-cd /Users/nimrodsilberfeld/self_projects/cli-test
-npm install
-```
-
 ## Usage
 
 - Help:
