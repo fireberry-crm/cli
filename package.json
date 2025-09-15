@@ -1,8 +1,10 @@
 {
-  "name": "fireberry-cli-demo",
+  "name": "@fireberry/cli",
   "version": "0.0.1",
-  "private": true,
+  "description": "Fireberry CLI tool",
   "type": "module",
+  "author": "",
+  "license": "MIT",
   "bin": {
     "fireberry": "bin/fireberry.js"
   },
@@ -11,6 +13,22 @@
   },
   "scripts": {
     "start": "node bin/fireberry.js"
+  },
+  "keywords": [
+    "cli",
+    "fireberry",
+    "tool"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fireberry-crm/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/fireberry-crm/cli/issues"
+  },
+  "homepage": "https://github.com/fireberry-crm/cli#readme",
+  "publishConfig": {
+    "access": "restricted"
   },
   "dependencies": {
     "chalk": "^5.3.0",
