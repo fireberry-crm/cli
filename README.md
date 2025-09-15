@@ -1,24 +1,43 @@
-# Fireberry CLI Demo
+# @fireberry/cli
 
-Minimal demo CLI with `init` command.
+Fireberry CLI tool for managing your Fireberry application.
+
+## Installation
+
+Install the CLI globally using npm:
+
+```bash
+npm install -g @fireberry/cli
+```
+
+After installation, the `fireberry` command will be available in your terminal.
 
 ## Usage
 
-- Help:
+### Get Help
+
+View all available commands and options:
 
 ```bash
-node bin/fireberry.js --help
-```
-
-- Initialize (store token locally for demo):
-
-```bash
-node bin/fireberry.js init <tokenid>
-```
-
-Optionally, link globally for `fireberry` command:
-
-```bash
-npm link
 fireberry --help
 ```
+
+### Initialize Workspace
+
+Set up your Fireberry workspace with your authentication token:
+
+```bash
+fireberry init <tokenid>
+```
+
+This will store your authentication token securely for future use.
+
+## Available Commands
+
+- `init <tokenid>`: Initialize your workspace with authentication
+- `--help`: Show help information for any command
+- `--version`: Show CLI version
+
+## License
+
+MIT
