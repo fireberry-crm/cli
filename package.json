@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/fireberry-crm/cli#readme",
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "dependencies": {
     "chalk": "^5.3.0",
