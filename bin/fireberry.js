@@ -7,7 +7,7 @@ const program = new Command();
 
 program
   .name("fireberry")
-  .description("Fireberry developer CLI (demo)")
+  .description("Fireberry developer CLI")
   .version("0.0.1");
 
 program
