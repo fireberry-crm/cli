@@ -13,7 +13,7 @@ program
 program
   .command("init")
   .argument("[tokenid]", "Fireberry token id")
-  .description("Initiates credentials and stores token in local config (demo)")
+  .description("Initiates credentials and stores token in local config")
   .action(async (tokenid) => {
     await runInit({ tokenid });
   });
