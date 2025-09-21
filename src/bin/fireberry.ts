@@ -2,13 +2,14 @@
 import { Command } from "commander";
 import chalk from "chalk";
 import { runInit } from "../commands/init.js";
+import packageJson from "../../package.json" with { type: "json" };
 
 const program = new Command();
 
 program
   .name("fireberry")
   .description("Fireberry developer CLI")
-  .version("0.0.1");
+  .version(packageJson.version as string);
 
 program
   .command("init")
@@ -19,6 +20,11 @@ program
   });
 
 program.parseAsync(process.argv).catch((err: unknown) => {
-  console.error(chalk.red((err as Error)?.message || "Unexpected error"));
+  const errorMessage = err instanceof Error 
+    ? err.message
+    : typeof err === 'string' 
+      ? err 
+      : 'Unexpected error';
+  console.error(chalk.red(errorMessage));
   process.exit(1);
 });
