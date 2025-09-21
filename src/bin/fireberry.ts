@@ -9,7 +9,7 @@ const program = new Command();
 program
   .name("fireberry")
   .description("Fireberry developer CLI")
-  .version(packageJson.version as string);
+  .version(packageJson.version);
 
 program
   .command("init")
