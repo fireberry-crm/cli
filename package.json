@@ -6,13 +6,18 @@
   "author": "",
   "license": "MIT",
   "bin": {
-    "fireberry": "bin/fireberry.js"
+    "fireberry": "dist/bin/fireberry.js"
   },
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "start": "node bin/fireberry.js"
+    "start": "node dist/bin/fireberry.js",
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "prepare": "npm run build"
   },
   "keywords": [
     "cli",
@@ -37,5 +42,11 @@
     "fs-extra": "^11.2.0",
     "inquirer": "^9.2.12",
     "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.11.24",
+    "typescript": "^5.3.3"
   }
 }
