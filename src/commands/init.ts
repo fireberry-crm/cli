@@ -10,7 +10,7 @@ interface InitOptions {
 }
 
 interface Config {
-  token: string;
+  apiToken: string;
   createdAt: string;
 }
 
@@ -35,15 +35,15 @@ export async function runInit({ tokenid }: InitOptions = {}): Promise<void> {
   const configDir = paths.config;
   const configFile = path.join(configDir, "config.json");
 
-  const spinner = ora("Saving token to local config").start();
+  const spinner = ora("Saving API Token to local config").start();
   try {
     await fs.ensureDir(configDir);
     const config: Config = {
-      token,
+      apiToken: token,
       createdAt: new Date().toISOString(),
     };
     await fs.writeJson(configFile, config, { spaces: 2 });
-    spinner.succeed("Initialized. Token stored locally for demo purposes.");
+    spinner.succeed("Initialized. Token stored locally.");
     console.log(chalk.gray(`Config: ${configFile}`));
   } catch (err) {
     spinner.fail("Failed to save token.");
