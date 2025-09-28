@@ -6,7 +6,11 @@ on:
       version:
         description: "Version to publish (e.g., 0.0.4)"
         required: true
-        type: string
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   publish:
