@@ -5,7 +5,16 @@ import fs from "fs-extra";
 import ora from "ora";
 import chalk from "chalk";
 
-export async function runInit({ tokenid } = {}) {
+interface InitOptions {
+  tokenid?: string;
+}
+
+interface Config {
+  apiToken: string;
+  createdAt: string;
+}
+
+export async function runInit({ tokenid }: InitOptions = {}): Promise<void> {
   let token = tokenid;
   if (!token) {
     const answers = await inquirer.prompt([
@@ -26,11 +35,11 @@ export async function runInit({ tokenid } = {}) {
   const configDir = paths.config;
   const configFile = path.join(configDir, "config.json");
 
-  const spinner = ora("Saving token to local config").start();
+  const spinner = ora("Saving API Token to local config").start();
   try {
     await fs.ensureDir(configDir);
-    const config = {
-      token,
+    const config: Config = {
+      apiToken: token,
       createdAt: new Date().toISOString(),
     };
     await fs.writeJson(configFile, config, { spaces: 2 });
