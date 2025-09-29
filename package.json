@@ -17,7 +17,8 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test": "node test/smoke.test.js"
   },
   "keywords": [
     "cli",
