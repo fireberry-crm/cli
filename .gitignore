@@ -2,6 +2,7 @@ node_modules/
 .DS_Store
 .env
 
+
 # Logs
 *.log
 npm-debug.log*
@@ -17,3 +18,6 @@ build/
 # Debug
 .npm
 .eslintcache
+
+# Development docs
+DEVELOPMENT.md

@@ -1,6 +1,6 @@
 {
   "name": "@fireberry/cli",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Fireberry CLI tool",
   "type": "module",
   "author": "",
@@ -42,12 +42,14 @@
     "env-paths": "^3.0.0",
     "fs-extra": "^11.2.0",
     "inquirer": "^9.2.12",
-    "ora": "^8.0.1"
+    "ora": "^8.0.1",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^20.11.24",
+    "@types/uuid": "^10.0.0",
     "typescript": "^5.3.3"
   }
 }
