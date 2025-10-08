@@ -9,7 +9,7 @@ interface InitOptions {
   tokenid?: string;
 }
 
-interface Config {
+export interface Config {
   apiToken: string;
   createdAt: string;
 }

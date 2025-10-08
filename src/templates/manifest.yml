@@ -1,7 +1,7 @@
 app:
-  id: { { appId } }
+  id: "{{appId}}"
   name: "{{appName}}"
-  description: "This is my first application"
+  description: ""
 components:
   - type: record
     title: my-first-component

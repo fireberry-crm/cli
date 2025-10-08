@@ -37,8 +37,10 @@
     "access": "public"
   },
   "dependencies": {
+    "axios": "^1.12.2",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
+    "dotenv": "^17.2.3",
     "env-paths": "^3.0.0",
     "fs-extra": "^11.2.0",
     "inquirer": "^9.2.12",
