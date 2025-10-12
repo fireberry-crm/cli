@@ -14,6 +14,7 @@
   "scripts": {
     "start": "node dist/bin/fireberry.js",
     "build": "tsc",
+    "build:dev": "npm run clean && tsc && npm link && chmod +x dist/bin/fireberry.js",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
@@ -46,6 +47,7 @@
     "inquirer": "^9.2.12",
     "js-yaml": "^4.1.0",
     "ora": "^8.0.1",
+    "tar": "^7.5.1",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
