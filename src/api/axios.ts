@@ -5,7 +5,7 @@ import { getApiToken } from "./config.js";
 const BASE_URL =
   process.env.FIREBERRY_API_URL || "https://app.fireberry.com/api/v3";
 
-const apiClient: AxiosInstance = axios.create({
+const fbApi: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
   headers: {
@@ -14,7 +14,7 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-apiClient.interceptors.request.use(
+fbApi.interceptors.request.use(
   async (config) => {
     try {
       const token = await getApiToken();
@@ -35,24 +35,15 @@ export async function sendApiRequest<T = any>(
   config: AxiosRequestConfig
 ): Promise<T> {
   try {
-    const response = await apiClient.request<T>(config);
+    const response = await fbApi.request<T>(config);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const message = error.response?.data?.message || error.message;
       const status = error.response?.status;
-      const fullUrl = error.config?.url
-        ? `${BASE_URL}${error.config.url}`
-        : "Unknown URL";
-      throw new Error(`API Error (${status}) at ${fullUrl}: ${message}`);
+      throw new Error(`API Error${status ? ` (${status})` : ""}: ${message}`);
     }
-
-    const fullUrl = config.url ? `${BASE_URL}${config.url}` : "Unknown URL";
-    throw new Error(
-      `Request failed at ${fullUrl}: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+    throw error;
   }
 }
 
@@ -73,4 +64,4 @@ export const api = {
     sendApiRequest<T>({ ...config, method: "DELETE", url }),
 };
 
-export default apiClient;
+export default fbApi;
