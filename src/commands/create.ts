@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "node:url";
 import ora from "ora";
 import chalk from "chalk";
-import { requests } from "../api/requests.js";
+import { createApp } from "../api/requests.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,7 +52,7 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
   const spinner = ora(`Creating app "${chalk.cyan(appName)}"...`).start();
 
   try {
-    await requests.createApp({ appId });
+    await createApp({ appId });
 
     await fs.ensureDir(appDir);
 
