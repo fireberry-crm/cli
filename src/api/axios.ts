@@ -1,16 +1,17 @@
 import "../config/env.js";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { getApiToken } from "./config.js";
+import packageJson from "../../package.json" with { type: "json" };
 
 const BASE_URL =
   process.env.FIREBERRY_API_URL || "https://app.fireberry.com/api/v3";
 
 const fbApi: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
-    "User-Agent": "@fireberry/cli",
+    "User-Agent": `@fireberry/cli@${packageJson.version}`,
   },
 });
 
