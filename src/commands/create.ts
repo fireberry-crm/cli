@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "node:url";
 import ora from "ora";
 import chalk from "chalk";
+import { createApp } from "../api/requests.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,7 +38,6 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
     appName = (answers.name || "").trim();
   }
   if (!appName) {
-    console.error(chalk.red("Error: App name is required."));
     throw new Error("App name is required.");
   }
 
@@ -46,15 +46,14 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
   const appDir = path.resolve(process.cwd(), slug);
 
   if (await fs.pathExists(appDir)) {
-    console.error(
-      chalk.red(`Error: Directory already exists: ${chalk.yellow(appDir)}`)
-    );
-    throw new Error(`Directory already exists: ${appDir}`);
+    throw new Error(`Directory already exists: ${chalk.yellow(appDir)}`);
   }
 
   const spinner = ora(`Creating app "${chalk.cyan(appName)}"...`).start();
 
   try {
+    await createApp({ appId });
+
     await fs.ensureDir(appDir);
 
     const templatesDir = path.join(__dirname, "..", "..", "src", "templates");
@@ -84,11 +83,6 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
     console.log(chalk.white("   # Start developing your Fireberry app"));
   } catch (error) {
     spinner.fail(`Failed to create app "${chalk.cyan(appName)}"`);
-    console.error(
-      chalk.red(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-      )
-    );
     throw error;
   }
 }
