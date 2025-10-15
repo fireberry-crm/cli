@@ -36,6 +36,7 @@ export async function sendApiRequest<T = any>(
 ): Promise<T> {
   try {
     const response = await fbApi.request<T>(config);
+
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -60,8 +61,8 @@ export const api = {
   patch: <T = any>(url: string, data?: any, config?: AxiosRequestConfig) =>
     sendApiRequest<T>({ ...config, method: "PATCH", url, data }),
 
-  delete: <T = any>(url: string, config?: AxiosRequestConfig) =>
-    sendApiRequest<T>({ ...config, method: "DELETE", url }),
+  delete: <T = any>(url: string, data?: any, config?: AxiosRequestConfig) =>
+    sendApiRequest<T>({ ...config, method: "DELETE", url, data }),
 };
 
 export default fbApi;

@@ -2,8 +2,6 @@ export interface CreateAppRequest {
   appId: string;
 }
 
-export interface CreateAppResponse {}
-
 export interface ApiError {
   message: string;
   code?: string;
