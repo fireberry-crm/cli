@@ -1,0 +1,10 @@
+app:
+  id: "{{appId}}"
+  name: "{{appName}}"
+  description: ""
+components:
+  - type: record
+    title: my-first-component
+    key: comp
+    path: static/comp/build
+    settings: {}
