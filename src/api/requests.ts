@@ -21,7 +21,7 @@ export const requests = {
     appId: string,
     components: ZippedComponent[]
   ): Promise<void> => {
-    const url = `/services/developer/push-components`;
+    const url = `/services/developer/push`;
     try {
       const response = await api.post<void>(url, { appId, components });
       return response;

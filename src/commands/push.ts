@@ -6,6 +6,7 @@ import chalk from "chalk";
 import * as tar from "tar";
 import os from "node:os";
 import { Manifest, ZippedComponent } from "../api/types.js";
+import { requests } from "../api/requests.js";
 
 const getManifest = async (): Promise<Manifest> => {
   const manifestPath = path.join(process.cwd(), "manifest.yml");
@@ -120,6 +121,7 @@ export async function runPush(): Promise<void> {
 
   try {
     const manifest = await getManifest();
+    console.log("Uploading manifest ", manifest);
     spinner.succeed("Manifest loaded successfully");
 
     spinner.start("Validating and zipping components...");
@@ -142,7 +144,8 @@ export async function runPush(): Promise<void> {
 
       // TODO: Send zippedComponents to server
       spinner.start("Uploading to Fireberry...");
-      await pushComponents(manifest.app.id, zippedComponents);
+
+      await requests.pushComponents(manifest.app.id, zippedComponents);
       spinner.info("Upload not yet implemented");
     } else {
       spinner.succeed("No components to push");
