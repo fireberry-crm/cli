@@ -44,14 +44,20 @@ const validateComponentBuild = async (componentPath: string, title: string) => {
     );
   }
 
-  const files = await fs.readdir(componentPath);
-  if (files.length === 0) {
-    throw new Error(
-      `Component "${title}" directory is empty: ${chalk.yellow(
-        componentPath
-      )}\n` + `Make sure you've built your component.`
-    );
+  const stats = await fs.stat(componentPath);
+
+  // If it's a directory, check it's not empty
+  if (stats.isDirectory()) {
+    const files = await fs.readdir(componentPath);
+    if (files.length === 0) {
+      throw new Error(
+        `Component "${title}" directory is empty: ${chalk.yellow(
+          componentPath
+        )}\n` + `Make sure you've built your component.`
+      );
+    }
   }
+  // If it's a file, that's also valid - we'll handle it in zipComponentBuild
 };
 
 const zipComponentBuild = async (
@@ -63,15 +69,37 @@ const zipComponentBuild = async (
   const tarballPath = path.join(tmpDir, `${title}.tar.gz`);
 
   try {
-    // Create tar.gz archive
-    await tar.create(
-      {
-        gzip: true,
-        file: tarballPath,
-        cwd: componentPath,
-      },
-      ["."] // Archive everything in the directory
-    );
+    const stats = await fs.stat(componentPath);
+
+    if (stats.isDirectory()) {
+      // Archive the entire directory
+      await tar.create(
+        {
+          gzip: true,
+          file: tarballPath,
+          cwd: componentPath,
+        },
+        ["."] // Archive everything in the directory
+      );
+    } else {
+      // It's a single file - create a temp directory structure
+      const tempBuildDir = path.join(tmpDir, "build");
+      await fs.ensureDir(tempBuildDir);
+
+      // Copy the file to the temp directory
+      const fileName = path.basename(componentPath);
+      await fs.copy(componentPath, path.join(tempBuildDir, fileName));
+
+      // Archive the temp directory
+      await tar.create(
+        {
+          gzip: true,
+          file: tarballPath,
+          cwd: tempBuildDir,
+        },
+        ["."]
+      );
+    }
 
     const buffer = await fs.readFile(tarballPath);
 
