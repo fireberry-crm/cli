@@ -3,14 +3,22 @@ name: Publish Fireberry CLI to npm
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: "Version to publish (e.g., 0.0.4)"
+      type:
+        description: "Publish type"
         required: true
+        type: choice
+        options:
+          - beta
+          - production
+      version:
+        description: "Version bump (for production only)"
+        required: false
         type: choice
         options:
           - patch
           - minor
           - major
+        default: patch
 
 jobs:
   publish:
@@ -34,7 +42,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Update version
+      - name: Update version (Beta)
+        if: github.event.inputs.type == 'beta'
+        run: npm version prerelease --preid=beta --no-git-tag-version
+
+      - name: Update version (Production)
+        if: github.event.inputs.type == 'production'
         run: npm version ${{ github.event.inputs.version }} --no-git-tag-version
 
       - name: Build package
@@ -43,7 +56,14 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Publish to npm
-        run: npm publish --provenance --access public
+      - name: Publish to npm (Beta)
+        if: github.event.inputs.type == 'beta'
+        run: npm publish --tag beta --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to npm (Production)
+        if: github.event.inputs.type == 'production'
+        run: npm publish --tag latest --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

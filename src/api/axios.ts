@@ -3,8 +3,22 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { getApiToken } from "./config.js";
 import packageJson from "../../package.json" with { type: "json" };
 
-const BASE_URL =
-  process.env.FIREBERRY_API_URL || "https://app.fireberry.com/api/v3";
+// Determine default API URL based on version
+const getDefaultApiUrl = () => {
+  if (process.env.FIREBERRY_API_URL) {
+    return process.env.FIREBERRY_API_URL;
+  }
+  
+  const isBeta = packageJson.version.includes("beta");
+  
+  if (isBeta) {
+    return process.env.FIREBERRY_STAGING_URL || "https://dev.fireberry.com/api/v3";
+  }
+  
+  return "https://api.fireberry.com/api/v3";
+};
+
+const BASE_URL = getDefaultApiUrl();
 
 const fbApi: AxiosInstance = axios.create({
   baseURL: BASE_URL,

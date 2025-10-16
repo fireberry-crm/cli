@@ -18,7 +18,10 @@
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "prepare": "npm run build",
-    "test": "node test/smoke.test.js"
+    "test": "node test/smoke.test.js",
+    "version:beta": "npm version prerelease --preid=beta",
+    "publish:beta": "npm run version:beta && npm publish --tag beta",
+    "publish:prod": "npm publish --tag latest"
   },
   "keywords": [
     "cli",
