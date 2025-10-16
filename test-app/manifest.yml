@@ -1,0 +1,15 @@
+app:
+  id: "712170eb-fe5d-4e0f-bf62-e76eb67be4cc"
+  name: "test-app"
+  description: ""
+components:
+  - type: record
+    title: my-first-component
+    key: comp
+    path: index.html
+    settings: {}
+  - type: record
+    title: my-second-component
+    key: comp2
+    path: index.html
+    settings: {}
