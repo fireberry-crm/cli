@@ -68,7 +68,7 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
 
     const manifestContent = manifestTemplate
       .replace(/{{appName}}/g, appName)
-      .replace(/{ { appId } }/g, appId);
+      .replace(/{{appId}}/g, appId);
 
     const htmlContent = htmlTemplate.replace(/{{appName}}/g, appName);
 
