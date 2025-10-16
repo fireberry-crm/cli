@@ -22,7 +22,7 @@ interface ManifestApp {
   description?: string;
 }
 
-interface ManifestComponent {
+export interface ManifestComponent {
   type: string;
   title: string;
   key: string;

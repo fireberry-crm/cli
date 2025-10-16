@@ -5,7 +5,7 @@ import yaml from "js-yaml";
 import chalk from "chalk";
 import * as tar from "tar";
 import os from "node:os";
-import { Manifest, ZippedComponent } from "../api/types.js";
+import { Manifest, ManifestComponent, ZippedComponent } from "../api/types.js";
 import { requests } from "../api/requests.js";
 
 const getManifest = async (): Promise<Manifest> => {
@@ -35,10 +35,13 @@ const getManifest = async (): Promise<Manifest> => {
   return manifest;
 };
 
-const validateComponentBuild = async (componentPath: string, title: string) => {
+const validateComponentBuild = async (
+  componentPath: string,
+  comp: ManifestComponent
+) => {
   if (!(await fs.pathExists(componentPath))) {
     throw new Error(
-      `Component "${title}" path does not exist: ${chalk.yellow(
+      `Component "${comp.title}" path does not exist: ${chalk.yellow(
         componentPath
       )}\n` + `Make sure the path in manifest.yml is correct.`
     );
@@ -50,14 +53,10 @@ const validateComponentBuild = async (componentPath: string, title: string) => {
   if (stats.isDirectory()) {
     const files = await fs.readdir(componentPath);
     if (files.length === 0) {
-      throw new Error(
-        `Component "${title}" directory is empty: ${chalk.yellow(
-          componentPath
-        )}\n` + `Make sure you've built your component.`
-      );
+      // Component <components.key> at: /<PATH>/components.path not found
+      throw new Error(`Component <${comp.key}> at: /${comp.path} not found`);
     }
   }
-  // If it's a file, that's also valid - we'll handle it in zipComponentBuild
 };
 
 const zipComponentBuild = async (
@@ -130,7 +129,7 @@ const handleComponents = async (
   for (const comp of components) {
     const componentPath = path.join(process.cwd(), comp.path);
 
-    await validateComponentBuild(componentPath, comp.title);
+    await validateComponentBuild(componentPath, comp);
 
     const buildBuffer = await zipComponentBuild(componentPath, comp.title);
 
