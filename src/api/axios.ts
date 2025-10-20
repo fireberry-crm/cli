@@ -55,9 +55,21 @@ export async function sendApiRequest<T = any>(
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      const message = error.response?.data?.message || error.message;
       const status = error.response?.status;
-      throw new Error(`API Error${status ? ` (${status})` : ""}: ${message}`);
+      let errorMessage:string;
+
+      switch (status) {
+        case 401:
+          errorMessage = "Unauthorized user.";
+          break;
+        case 500:
+          errorMessage = "Internal server error.";
+          break;
+        default:
+          errorMessage = error.response?.data?.message || error.message;
+      }
+
+      throw new Error(`Error: ${errorMessage}`);
     }
     throw error;
   }
