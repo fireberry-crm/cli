@@ -15,7 +15,7 @@ export interface Config {
 }
 
 export async function runInit({ tokenid }: InitOptions = {}): Promise<void> {
-  let token = tokenid;
+  let token = tokenid?.trim();
   if (!token) {
     const answers = await inquirer.prompt([
       {
