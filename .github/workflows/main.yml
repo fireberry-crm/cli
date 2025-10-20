@@ -44,7 +44,13 @@ jobs:
 
       - name: Update version (Beta)
         if: github.event.inputs.type == 'beta'
-        run: npm version prerelease --preid=beta --no-git-tag-version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          if [[ $CURRENT_VERSION == *"-beta."* ]]; then
+            npm version prerelease --preid=beta --no-git-tag-version
+          else
+            npm version prepatch --preid=beta --no-git-tag-version
+          fi
 
       - name: Update version (Production)
         if: github.event.inputs.type == 'production'
