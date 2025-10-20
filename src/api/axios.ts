@@ -40,10 +40,6 @@ export async function sendApiRequest<T = any>(
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const message = error.response?.data?.message || error.message;
-      const status = error.response?.status;
-      const fullUrl = error.config?.url
-        ? `${BASE_URL}${error.config.url}`
-        : "Unknown URL";
       throw new Error(`Error: ${message}`);
     }
 
