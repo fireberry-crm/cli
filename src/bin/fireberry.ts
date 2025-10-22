@@ -22,9 +22,10 @@ program
 
 program
   .command("create")
-  .argument("[name]", "App name")
+  .argument("[name...]", "App name")
   .description("Create a new Fireberry app")
-  .action(async (name?: string) => {
+  .action(async (nameArgs?: string[]) => {
+    const name = nameArgs ? nameArgs.join("-") : undefined;
     await runCreate({ name });
   });
 
