@@ -27,6 +27,9 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    environment:
+      name: npm
+      url: https://registry.npmjs.org
 
     steps:
       - name: Checkout repository
@@ -63,12 +66,12 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Update npm to latest version
+        run: npm install -g npm@latest
+
       - name: Publish to npm (Beta)
         if: github.event.inputs.type == 'beta'
         run: npm publish --tag beta --provenance --access public
-
-      - name: Update npm to latest version
-        run: npm install -g npm@latest
 
       - name: Publish to npm (Production)
         if: github.event.inputs.type == 'production'
