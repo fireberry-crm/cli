@@ -15,6 +15,7 @@ on:
         required: false
         type: choice
         options:
+          - prerelease
           - patch
           - minor
           - major
@@ -65,11 +66,10 @@ jobs:
       - name: Publish to npm (Beta)
         if: github.event.inputs.type == 'beta'
         run: npm publish --tag beta --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Update npm to latest version
+        run: npm install -g npm@latest
 
       - name: Publish to npm (Production)
         if: github.event.inputs.type == 'production'
         run: npm publish --tag latest --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
