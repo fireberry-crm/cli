@@ -30,7 +30,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fireberry-crm/cli"
+    "url": "git+https://github.com/fireberry-crm/cli.git"
   },
   "bugs": {
     "url": "https://github.com/fireberry-crm/cli/issues"
