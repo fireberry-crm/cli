@@ -29,7 +29,7 @@ jobs:
       id-token: write
     environment:
       name: npm
-      url: https://registry.npmjs.org
+      url: https://www.npmjs.com/package/@fireberry/cli/v/${{ github.event.inputs.version }}
 
     steps:
       - name: Checkout repository
