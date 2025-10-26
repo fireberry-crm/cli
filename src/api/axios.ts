@@ -3,7 +3,6 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { getApiToken } from "./config.js";
 import packageJson from "../../package.json" with { type: "json" };
 
-// Determine default API URL based on version
 const getDefaultApiUrl = () => {
   if (process.env.FIREBERRY_API_URL) {
     return process.env.FIREBERRY_API_URL;
