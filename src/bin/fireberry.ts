@@ -26,7 +26,7 @@ program
   .description("Create a new Fireberry app")
   .action(async (nameArgs?: string[]) => {
     const name = nameArgs ? nameArgs.join("-") : undefined;
-    await runCreate({ name });
+        await runCreate({ name });
   });
 
 program.parseAsync(process.argv).catch((err: unknown) => {
@@ -35,6 +35,8 @@ program.parseAsync(process.argv).catch((err: unknown) => {
     : typeof err === 'string' 
       ? err 
       : 'Unexpected error';
-  console.error(chalk.red(errorMessage));
+  
+  const formattedError = errorMessage.startsWith('Error:') ? errorMessage : `Error: ${errorMessage}`;
+  console.error(chalk.red(formattedError));
   process.exit(1);
 });
