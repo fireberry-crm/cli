@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "node:url";
 import ora from "ora";
 import chalk from "chalk";
-import { requests } from "../api/requests.js";
+import { createApp } from "../api/requests.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,15 +22,12 @@ function slugifyName(name: string) {
     );
   }
 
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
+  return name;
 }
 
 export async function runCreate({ name }: CreateOptions): Promise<void> {
   let appName = name;
+
   if (!appName) {
     const answers = await inquirer.prompt([
       { type: "input", name: "name", message: "App name" },
@@ -38,7 +35,7 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
     appName = (answers.name || "").trim();
   }
   if (!appName) {
-    throw new Error("App name is required.");
+    throw new Error("Missing name.");
   }
 
   const slug = slugifyName(appName);
@@ -46,13 +43,13 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
   const appDir = path.resolve(process.cwd(), slug);
 
   if (await fs.pathExists(appDir)) {
-    throw new Error(`Directory already exists: ${chalk.yellow(appDir)}`);
+    throw new Error(`Already exists. ${chalk.yellow(slug)}`);
   }
 
   const spinner = ora(`Creating app "${chalk.cyan(appName)}"...`).start();
 
   try {
-    await requests.createApp({ appId });
+    await createApp({ appId });
 
     await fs.ensureDir(appDir);
 

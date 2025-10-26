@@ -1,7 +1,7 @@
 import envPaths from "env-paths";
 import path from "node:path";
 import fs from "fs-extra";
-import { Config } from "../commands/init.js";
+import type { Config } from "../commands/init.js";
 
 export async function getApiToken(): Promise<string | null> {
   try {

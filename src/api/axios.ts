@@ -1,20 +1,35 @@
 import "../config/env.js";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { getApiToken } from "./config.js";
+import packageJson from "../../package.json" with { type: "json" };
 
-const BASE_URL =
-  process.env.FIREBERRY_API_URL || "https://api.fireberry.com/api/v3";
+// Determine default API URL based on version
+const getDefaultApiUrl = () => {
+  if (process.env.FIREBERRY_API_URL) {
+    return process.env.FIREBERRY_API_URL;
+  }
+  
+  const isBeta = packageJson.version.includes("beta");
+  
+  if (isBeta) {
+    return process.env.FIREBERRY_STAGING_URL || "https://dev.fireberry.com/api/v3";
+  }
+  
+  return "https://api.fireberry.com/api/v3";
+};
 
-const apiClient: AxiosInstance = axios.create({
+const BASE_URL = getDefaultApiUrl();
+
+const fbApi: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
-    "User-Agent": "@fireberry/cli",
+    "User-Agent": `@fireberry/cli@${packageJson.version}`,
   },
 });
 
-apiClient.interceptors.request.use(
+fbApi.interceptors.request.use(
   async (config) => {
     try {
       const token = await getApiToken();
@@ -35,20 +50,28 @@ export async function sendApiRequest<T = any>(
   config: AxiosRequestConfig
 ): Promise<T> {
   try {
-    const response = await apiClient.request<T>(config);
+    const response = await fbApi.request<T>(config);
+
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      const message = error.response?.data?.message || error.message;
-      throw new Error(`Error: ${message}`);
-    }
+      const status = error.response?.status;
+      let errorMessage:string;
 
-    const fullUrl = config.url ? `${BASE_URL}${config.url}` : "Unknown URL";
-    throw new Error(
-      `Request failed at ${fullUrl}: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+      switch (status) {
+        case 401:
+          errorMessage = "Unauthorized user.";
+          break;
+        case 500:
+          errorMessage = "Internal server error.";
+          break;
+        default:
+          errorMessage = error.response?.data?.message || error.message;
+      }
+
+      throw new Error(`Error: ${errorMessage}`);
+    }
+    throw error;
   }
 }
 
@@ -65,8 +88,8 @@ export const api = {
   patch: <T = any>(url: string, data?: any, config?: AxiosRequestConfig) =>
     sendApiRequest<T>({ ...config, method: "PATCH", url, data }),
 
-  delete: <T = any>(url: string, config?: AxiosRequestConfig) =>
-    sendApiRequest<T>({ ...config, method: "DELETE", url }),
+  delete: <T = any>(url: string, data?: any, config?: AxiosRequestConfig) =>
+    sendApiRequest<T>({ ...config, method: "DELETE", url, data }),
 };
 
-export default apiClient;
+export default fbApi;

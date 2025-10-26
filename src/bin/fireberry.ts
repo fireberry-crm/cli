@@ -23,10 +23,11 @@ program
 
 program
   .command("create")
-  .argument("[name]", "App name")
+  .argument("[name...]", "App name")
   .description("Create a new Fireberry app")
-  .action(async (name?: string) => {
-    await runCreate({ name });
+  .action(async (nameArgs?: string[]) => {
+    const name = nameArgs ? nameArgs.join("-") : undefined;
+        await runCreate({ name });
   });
 
 program
@@ -42,6 +43,8 @@ program.parseAsync(process.argv).catch((err: unknown) => {
     : typeof err === 'string' 
       ? err 
       : 'Unexpected error';
-  console.error(chalk.red(errorMessage));
+  
+  const formattedError = errorMessage.startsWith('Error:') ? errorMessage : `Error: ${errorMessage}`;
+  console.error(chalk.red(formattedError));
   process.exit(1);
 });
