@@ -5,8 +5,7 @@ import type { CreateAppRequest, ZippedComponent } from "./types.js";
 export const createApp = async (data: CreateAppRequest): Promise<void> => {
   const url = "/services/developer/create";
   try {
-    const response = await api.post<void>(url, data);
-    return response;
+    await api.post<void>(url, data);
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }
@@ -18,8 +17,7 @@ export const pushComponents = async (
 ): Promise<void> => {
   const url = `/services/developer/push`;
   try {
-    const response = await api.post<void>(url, { appId, components });
-    return response;
+    await api.post<void>(url, { appId, components });
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }

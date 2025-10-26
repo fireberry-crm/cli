@@ -1,7 +1,7 @@
 import ora from "ora";
 import chalk from "chalk";
-import { requests } from "../api/requests.js";
 import { getManifest, handleComponents } from "../utils/components.utils.js";
+import { pushComponents } from "../api/requests.js";
 
 export async function runPush(): Promise<void> {
   const spinner = ora("Checking manifest...").start();
@@ -30,7 +30,7 @@ export async function runPush(): Promise<void> {
 
       spinner.start("Uploading to Fireberry...");
 
-      await requests.pushComponents(manifest.app.id, zippedComponents);
+      await pushComponents(manifest.app.id, zippedComponents);
       spinner.info("Upload not yet implemented");
     } else {
       spinner.succeed("No components to push");
