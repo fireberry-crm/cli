@@ -34,7 +34,7 @@ fbApi.interceptors.request.use(
     try {
       const token = await getApiToken();
       if (token) {
-        config.headers.tokenid = token;
+        config.headers.tokenId = token;
       }
     } catch (error) {
       console.warn("Failed to get API token:", error);
