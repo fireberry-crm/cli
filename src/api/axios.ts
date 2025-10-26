@@ -3,7 +3,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { getApiToken } from "./config.js";
 
 const BASE_URL =
-  process.env.FIREBERRY_API_URL || "https://app.fireberry.com/api/v3";
+  process.env.FIREBERRY_API_URL || "https://api.fireberry.com/api/v3";
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -19,7 +19,7 @@ apiClient.interceptors.request.use(
     try {
       const token = await getApiToken();
       if (token) {
-        config.headers.tokenid = token;
+        config.headers.tokenId = token;
       }
     } catch (error) {
       console.warn("Failed to get API token:", error);
@@ -40,11 +40,7 @@ export async function sendApiRequest<T = any>(
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const message = error.response?.data?.message || error.message;
-      const status = error.response?.status;
-      const fullUrl = error.config?.url
-        ? `${BASE_URL}${error.config.url}`
-        : "Unknown URL";
-      throw new Error(`API Error (${status}) at ${fullUrl}: ${message}`);
+      throw new Error(`Error: ${message}`);
     }
 
     const fullUrl = config.url ? `${BASE_URL}${config.url}` : "Unknown URL";

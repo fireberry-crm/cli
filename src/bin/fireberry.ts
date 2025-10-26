@@ -4,6 +4,7 @@ import chalk from "chalk";
 import { runInit } from "../commands/init.js";
 import { runCreate } from "../commands/create.js";
 import packageJson from "../../package.json" with { type: "json" };
+import { runPush } from "../commands/push.js";
 
 const program = new Command();
 
@@ -26,6 +27,13 @@ program
   .description("Create a new Fireberry app")
   .action(async (name?: string) => {
     await runCreate({ name });
+  });
+
+program
+  .command("push")
+  .description("Push app to Fireberry")
+  .action(async () => {
+    await runPush();
   });
 
 program.parseAsync(process.argv).catch((err: unknown) => {
