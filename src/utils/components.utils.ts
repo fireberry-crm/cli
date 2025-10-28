@@ -49,6 +49,7 @@ export const validateComponentBuild = async (
 
   if (stats.isDirectory()) {
     const files = await fs.readdir(componentPath);
+
     if (files.length === 0) {
       throw new Error(`Component <${comp.key}> at: /${comp.path} not found`);
     }
@@ -102,12 +103,10 @@ export const zipComponentBuild = async (
   }
 };
 
-export const handleComponents = async (
-  manifest: Manifest
-): Promise<ZippedComponent[]> => {
+export const validateManifestComponents = async (manifest: Manifest) => {
   const components = manifest.components;
   if (!components || components.length === 0) {
-    return [];
+    throw new Error("No components found in manifest");
   }
 
   const keys = components.map((comp) => comp.key);
@@ -115,12 +114,22 @@ export const handleComponents = async (
     throw new Error("All component keys must be unique");
   }
 
+  for (const comp of components) {
+    const componentPath = path.join(process.cwd(), comp.path);
+    await validateComponentBuild(componentPath, comp);
+  }
+};
+
+export const handleComponents = async (
+  manifest: Manifest
+): Promise<ZippedComponent[]> => {
+  await validateManifestComponents(manifest);
+  const components = manifest.components!;
+
   const zippedComponents: ZippedComponent[] = [];
 
   for (const comp of components) {
     const componentPath = path.join(process.cwd(), comp.path);
-
-    await validateComponentBuild(componentPath, comp);
 
     const buildBuffer = await zipComponentBuild(componentPath, comp.title);
 
