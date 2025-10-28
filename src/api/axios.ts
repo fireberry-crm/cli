@@ -59,7 +59,7 @@ export async function sendApiRequest<T = any>(
 
       switch (status) {
         case 401:
-          console.log(error.response?.data?.message || error.message);
+          console.log(error.response?.data?.message || error.message); // TODO: remove this
           errorMessage = "Unauthorized user.";
           break;
         case 500:
