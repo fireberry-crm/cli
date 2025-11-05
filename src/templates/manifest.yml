@@ -10,4 +10,4 @@ components:
     settings:
       iconName: "related-single"
       iconColor: "#7aae7f"
-      objectType: 5
+      objectType: 0
