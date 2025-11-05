@@ -7,4 +7,7 @@ components:
     title: my-first-component
     key: comp
     path: static/comp/build
-    settings: {}
+    settings:
+      iconName: "related-single"
+      iconColor: "#7aae7f"
+      objectType: 0
