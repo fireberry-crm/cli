@@ -23,7 +23,7 @@ interface ManifestApp {
 export interface ManifestComponent {
   type: string;
   title: string;
-  key: string;
+  id: string;
   path: string;
   settings?: Record<string, unknown>;
 }
@@ -35,6 +35,6 @@ export interface Manifest {
 
 export interface ZippedComponent {
   title: string;
-  key: string;
+  id: string;
   build: Buffer;
 }

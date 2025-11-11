@@ -24,7 +24,7 @@ export async function runPush(): Promise<void> {
       zippedComponents.forEach((comp, idx) => {
         const sizeKB = (comp.build.length / 1024).toFixed(2);
         console.log(
-          chalk.gray(`  ${idx + 1}. ${comp.title} (${comp.key}) - ${sizeKB} KB`)
+          chalk.gray(`  ${idx + 1}. ${comp.title} (${comp.id}) - ${sizeKB} KB`)
         );
       });
 
