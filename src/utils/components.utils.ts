@@ -51,7 +51,7 @@ export const validateComponentBuild = async (
     const files = await fs.readdir(componentPath);
 
     if (files.length === 0) {
-      throw new Error(`Component <${comp.key}> at: /${comp.path} not found`);
+      throw new Error(`Component <${comp.id}> at: /${comp.path} not found`);
     }
   }
 };
@@ -109,9 +109,9 @@ export const validateManifestComponents = async (manifest: Manifest) => {
     throw new Error("No components found in manifest");
   }
 
-  const keys = components.map((comp) => comp.key);
-  if (new Set(keys).size !== keys.length) {
-    throw new Error("All component keys must be unique");
+  const ids = components.map((comp) => comp.id);
+  if (new Set(ids).size !== ids.length) {
+    throw new Error("All component ids must be unique");
   }
 
   for (const comp of components) {
@@ -135,7 +135,7 @@ export const handleComponents = async (
 
     zippedComponents.push({
       title: comp.title,
-      key: comp.key,
+      id: comp.id,
       build: buildBuffer,
     });
   }

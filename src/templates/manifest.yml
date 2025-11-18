@@ -5,7 +5,7 @@ app:
 components:
   - type: record
     title: my-first-component
-    key: comp
+    id: "{{componentId}}"
     path: static/comp/build
     settings:
       iconName: "related-single"
