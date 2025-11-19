@@ -9,13 +9,13 @@ interface InitOptions {
   tokenid?: string;
 }
 
-interface Config {
+export interface Config {
   apiToken: string;
   createdAt: string;
 }
 
 export async function runInit({ tokenid }: InitOptions = {}): Promise<void> {
-  let token = tokenid;
+  let token = tokenid?.trim();
   if (!token) {
     const answers = await inquirer.prompt([
       {

@@ -1,0 +1,13 @@
+app:
+  id: "{{appId}}"
+  name: "{{appName}}"
+  description: ""
+components:
+  - type: record
+    title: my-first-component
+    id: "{{componentId}}"
+    path: static/comp/build
+    settings:
+      iconName: "related-single"
+      iconColor: "#7aae7f"
+      objectType: 0
