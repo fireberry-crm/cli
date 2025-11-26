@@ -47,10 +47,9 @@ program.command("install")
 
 program
   .command("delete")
-  .argument("[app-id]", "App ID to delete")
   .description("Delete a Fireberry app")
-  .action(async (appId: string) => {
-    await runDelete({ appId });
+  .action(async () => {
+    await runDelete();
   });
 
 program.parseAsync(process.argv).catch((err: unknown) => {

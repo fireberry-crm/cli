@@ -2,10 +2,6 @@ export interface CreateAppRequest {
   appId: string;
 }
 
-export interface DeleteAppRequest {
-  appId: string;
-}
-
 export interface ApiError {
   message: string;
   code?: string;

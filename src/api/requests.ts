@@ -2,7 +2,6 @@ import "../config/env.js";
 import { api } from "./axios.js";
 import type {
   CreateAppRequest,
-  DeleteAppRequest,
   Manifest,
   ZippedComponent,
 } from "./types.js";
@@ -37,8 +36,8 @@ export const installApp = async (manifest: Manifest): Promise<void> => {
   }
 };
 
-export const deleteApp = async (data: DeleteAppRequest): Promise<void> => {
-  const url = `/services/developer/delete/${data.appId}`;
+export const deleteApp = async (manifest: Manifest): Promise<void> => {
+  const url = `/services/developer/delete/${manifest.app.id}`;
   try {
     await api.delete<void>(url);
   } catch (error) {
