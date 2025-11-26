@@ -1,6 +1,10 @@
 import "../config/env.js";
 import { api } from "./axios.js";
-import type { CreateAppRequest, Manifest, ZippedComponent } from "./types.js";
+import type {
+  CreateAppRequest,
+  Manifest,
+  ZippedComponent,
+} from "./types.js";
 
 export const createApp = async (data: CreateAppRequest): Promise<void> => {
   const url = "/services/developer/create";
@@ -27,6 +31,15 @@ export const installApp = async (manifest: Manifest): Promise<void> => {
   const url = `/services/developer/install`;
   try {
     await api.post<void>(url, { manifest });
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : "Unknown error");
+  }
+};
+
+export const deleteApp = async (manifest: Manifest): Promise<void> => {
+  const url = `/services/developer/delete/${manifest.app.id}`;
+  try {
+    await api.delete<void>(url);
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }
