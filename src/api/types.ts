@@ -1,3 +1,5 @@
+import { COMPONENT_TYPE } from "../constants/component-types.js";
+
 export interface CreateAppRequest {
   appId: string;
 }
@@ -41,12 +43,12 @@ export interface BaseManifestComponent {
 }
 
 export interface RecordComponent extends BaseManifestComponent {
-  type: "record";
+  type: typeof COMPONENT_TYPE.RECORD;
   settings: RecordComponentSettings;
 }
 
 export interface GlobalMenuComponent extends BaseManifestComponent {
-  type: "global-menu";
+  type: typeof COMPONENT_TYPE.GLOBAL_MENU;
   settings: GlobalMenuComponentSettings;
 }
 

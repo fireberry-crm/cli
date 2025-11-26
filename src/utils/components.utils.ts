@@ -11,6 +11,7 @@ import {
   RecordComponentSettings,
   GlobalMenuComponentSettings,
 } from "../api/types.js";
+import { COMPONENT_TYPE } from "../constants/component-types.js";
 
 export const getManifest = async (): Promise<Manifest> => {
   const manifestPath = path.join(process.cwd(), "manifest.yml");
@@ -42,11 +43,13 @@ export const getManifest = async (): Promise<Manifest> => {
 const validateRecordComponentSettings = (
   comp: UntypedManifestComponent
 ): void => {
-  const settings = comp.settings as Partial<RecordComponentSettings> | undefined;
+  const settings = comp.settings as
+    | Partial<RecordComponentSettings>
+    | undefined;
 
   if (!settings) {
     throw new Error(
-      `Component "${comp.title}" (type: record) is missing required settings`
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) is missing required settings`
     );
   }
 
@@ -56,29 +59,29 @@ const validateRecordComponentSettings = (
     "objectType",
   ];
 
-  for (const field of requiredFields) {
-    if (settings[field] === undefined || settings[field] === null) {
+  for (const fieldName of requiredFields) {
+    if (settings[fieldName] === undefined || settings[fieldName] === null) {
       throw new Error(
-        `Component "${comp.title}" (type: record) is missing required setting: ${field}`
+        `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) is missing required setting: ${fieldName}`
       );
     }
   }
 
   if (typeof settings.iconName !== "string") {
     throw new Error(
-      `Component "${comp.title}" (type: record) setting "iconName" must be a string`
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "iconName" must be a string`
     );
   }
 
   if (typeof settings.iconColor !== "string") {
     throw new Error(
-      `Component "${comp.title}" (type: record) setting "iconColor" must be a string`
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "iconColor" must be a string`
     );
   }
 
   if (typeof settings.objectType !== "number") {
     throw new Error(
-      `Component "${comp.title}" (type: record) setting "objectType" must be a number`
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "objectType" must be a number`
     );
   }
 };
@@ -86,38 +89,40 @@ const validateRecordComponentSettings = (
 const validateGlobalMenuComponentSettings = (
   comp: UntypedManifestComponent
 ): void => {
-  const settings = comp.settings as Partial<GlobalMenuComponentSettings> | undefined;
+  const settings = comp.settings as
+    | Partial<GlobalMenuComponentSettings>
+    | undefined;
 
   if (!settings) {
     throw new Error(
-      `Component "${comp.title}" (type: global-menu) is missing required settings`
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.GLOBAL_MENU}) is missing required settings`
     );
   }
 
   if (!settings.displayName) {
     throw new Error(
-      `Component "${comp.title}" (type: global-menu) is missing required setting: displayName`
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.GLOBAL_MENU}) is missing required setting: displayName`
     );
   }
 
   if (typeof settings.displayName !== "string") {
     throw new Error(
-      `Component "${comp.title}" (type: global-menu) setting "displayName" must be a string`
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.GLOBAL_MENU}) setting "displayName" must be a string`
     );
   }
 };
 
 const validateComponentSettings = (comp: UntypedManifestComponent): void => {
   switch (comp.type) {
-    case "record":
+    case COMPONENT_TYPE.RECORD:
       validateRecordComponentSettings(comp);
       break;
-    case "global-menu":
+    case COMPONENT_TYPE.GLOBAL_MENU:
       validateGlobalMenuComponentSettings(comp);
       break;
     default:
       throw new Error(
-        `Component "${comp.title}" has unsupported type: ${comp.type}. Supported types: record, global-menu`
+        `Component "${comp.title}" has unsupported type: ${comp.type}. Supported types: ${COMPONENT_TYPE.RECORD}, ${COMPONENT_TYPE.GLOBAL_MENU}`
       );
   }
 };
@@ -195,7 +200,9 @@ export const zipComponentBuild = async (
 };
 
 export const validateManifestComponents = async (manifest: Manifest) => {
-  const components = manifest.components as unknown as UntypedManifestComponent[] | undefined;
+  const components = manifest.components as unknown as
+    | UntypedManifestComponent[]
+    | undefined;
   if (!components || components.length === 0) {
     throw new Error("No components found in manifest");
   }
@@ -215,7 +222,8 @@ export const handleComponents = async (
   manifest: Manifest
 ): Promise<ZippedComponent[]> => {
   await validateManifestComponents(manifest);
-  const components = manifest.components as unknown as UntypedManifestComponent[];
+  const components =
+    manifest.components as unknown as UntypedManifestComponent[];
 
   const zippedComponents: ZippedComponent[] = [];
 
