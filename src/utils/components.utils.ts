@@ -4,7 +4,14 @@ import yaml from "js-yaml";
 import chalk from "chalk";
 import * as tar from "tar";
 import os from "node:os";
-import { Manifest, ManifestComponent, ZippedComponent } from "../api/types.js";
+import {
+  Manifest,
+  ZippedComponent,
+  UntypedManifestComponent,
+  RecordComponentSettings,
+  GlobalMenuComponentSettings,
+} from "../api/types.js";
+import { COMPONENT_TYPE } from "../constants/component-types.js";
 
 export const getManifest = async (): Promise<Manifest> => {
   const manifestPath = path.join(process.cwd(), "manifest.yml");
@@ -33,9 +40,96 @@ export const getManifest = async (): Promise<Manifest> => {
   return manifest;
 };
 
+const validateRecordComponentSettings = (
+  comp: UntypedManifestComponent
+): void => {
+  const settings = comp.settings as
+    | Partial<RecordComponentSettings>
+    | undefined;
+
+  if (!settings) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) is missing required settings`
+    );
+  }
+
+  const requiredFields: (keyof RecordComponentSettings)[] = [
+    "iconName",
+    "iconColor",
+    "objectType",
+  ];
+
+  for (const fieldName of requiredFields) {
+    if (settings[fieldName] === undefined || settings[fieldName] === null) {
+      throw new Error(
+        `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) is missing required setting: ${fieldName}`
+      );
+    }
+  }
+
+  if (typeof settings.iconName !== "string") {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "iconName" must be a string`
+    );
+  }
+
+  if (typeof settings.iconColor !== "string") {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "iconColor" must be a string`
+    );
+  }
+
+  if (typeof settings.objectType !== "number") {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "objectType" must be a number`
+    );
+  }
+};
+
+const validateGlobalMenuComponentSettings = (
+  comp: UntypedManifestComponent
+): void => {
+  const settings = comp.settings as
+    | Partial<GlobalMenuComponentSettings>
+    | undefined;
+
+  if (!settings) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.GLOBAL_MENU}) is missing required settings`
+    );
+  }
+
+  if (!settings.displayName) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.GLOBAL_MENU}) is missing required setting: displayName`
+    );
+  }
+
+  if (typeof settings.displayName !== "string") {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.GLOBAL_MENU}) setting "displayName" must be a string`
+    );
+  }
+};
+
+const validateComponentSettings = (comp: UntypedManifestComponent): void => {
+  switch (comp.type) {
+    case COMPONENT_TYPE.RECORD:
+      validateRecordComponentSettings(comp);
+      break;
+    case COMPONENT_TYPE.GLOBAL_MENU:
+      validateGlobalMenuComponentSettings(comp);
+      break;
+    default:
+      throw new Error(
+        `Component "${comp.title}" has unsupported type: ${comp.type}. Supported types: ${COMPONENT_TYPE.RECORD}, ${COMPONENT_TYPE.GLOBAL_MENU}`
+      );
+  }
+};
+
 export const validateComponentBuild = async (
   componentPath: string,
-  comp: ManifestComponent
+  comp: UntypedManifestComponent
 ) => {
   if (!(await fs.pathExists(componentPath))) {
     throw new Error(
@@ -54,6 +148,8 @@ export const validateComponentBuild = async (
       throw new Error(`Component <${comp.id}> at: /${comp.path} not found`);
     }
   }
+
+  validateComponentSettings(comp);
 };
 
 export const zipComponentBuild = async (
@@ -104,7 +200,9 @@ export const zipComponentBuild = async (
 };
 
 export const validateManifestComponents = async (manifest: Manifest) => {
-  const components = manifest.components;
+  const components = manifest.components as unknown as
+    | UntypedManifestComponent[]
+    | undefined;
   if (!components || components.length === 0) {
     throw new Error("No components found in manifest");
   }
@@ -124,7 +222,8 @@ export const handleComponents = async (
   manifest: Manifest
 ): Promise<ZippedComponent[]> => {
   await validateManifestComponents(manifest);
-  const components = manifest.components!;
+  const components =
+    manifest.components as unknown as UntypedManifestComponent[];
 
   const zippedComponents: ZippedComponent[] = [];
 

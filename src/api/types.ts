@@ -1,3 +1,5 @@
+import { COMPONENT_TYPE } from "../constants/component-types.js";
+
 export interface CreateAppRequest {
   appId: string;
 }
@@ -20,7 +22,39 @@ interface ManifestApp {
   description?: string;
 }
 
-export interface ManifestComponent {
+export interface RecordComponentSettings {
+  iconName: string;
+  iconColor: string;
+  objectType: number;
+}
+
+export interface GlobalMenuComponentSettings {
+  displayName: string;
+}
+
+export type ComponentSettings =
+  | RecordComponentSettings
+  | GlobalMenuComponentSettings;
+
+export interface BaseManifestComponent {
+  title: string;
+  id: string;
+  path: string;
+}
+
+export interface RecordComponent extends BaseManifestComponent {
+  type: typeof COMPONENT_TYPE.RECORD;
+  settings: RecordComponentSettings;
+}
+
+export interface GlobalMenuComponent extends BaseManifestComponent {
+  type: typeof COMPONENT_TYPE.GLOBAL_MENU;
+  settings: GlobalMenuComponentSettings;
+}
+
+export type ManifestComponent = RecordComponent | GlobalMenuComponent;
+
+export interface UntypedManifestComponent {
   type: string;
   title: string;
   id: string;
