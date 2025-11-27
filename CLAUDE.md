@@ -61,7 +61,7 @@ Each CLI command is in [src/commands/](src/commands/):
 ### API Layer ([src/api/](src/api/))
 - **axios.ts**: Axios instance with automatic token injection via interceptors
 - **API URL Logic**:
-  - Beta versions (version contains "beta") → `FIREBERRY_STAGING_URL` or `https://dev.fireberry.com/api/v3`
+  - Beta versions (version contains "beta") → Uses `FIREBERRY_STAGING_URL` environment variable
   - Production versions → `FIREBERRY_API_URL` or `https://api.fireberry.com/api/v3`
 - **Authentication**: Token passed via `tokenId` header (read from config in interceptor)
 - **requests.ts**: API endpoints (`createApp`, `pushComponents`, `installApp`)
