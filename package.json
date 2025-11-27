@@ -1,6 +1,6 @@
 {
   "name": "@fireberry/cli",
-  "version": "0.0.5-beta.12",
+  "version": "0.0.5-beta.14",
   "description": "Fireberry CLI tool",
   "type": "module",
   "author": "",
