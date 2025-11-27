@@ -32,9 +32,15 @@ export interface GlobalMenuComponentSettings {
   displayName: string;
 }
 
+export interface SideMenuComponentSettings {
+  icon: string;
+  width: "S" | "M" | "L";
+}
+
 export type ComponentSettings =
   | RecordComponentSettings
-  | GlobalMenuComponentSettings;
+  | GlobalMenuComponentSettings
+  | SideMenuComponentSettings;
 
 export interface BaseManifestComponent {
   title: string;
