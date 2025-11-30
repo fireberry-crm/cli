@@ -10,6 +10,7 @@ import {
   UntypedManifestComponent,
   RecordComponentSettings,
   GlobalMenuComponentSettings,
+  SideMenuComponentSettings,
 } from "../api/types.js";
 import { COMPONENT_TYPE } from "../constants/component-types.js";
 
@@ -112,6 +113,42 @@ const validateGlobalMenuComponentSettings = (
   }
 };
 
+const validateSideMenuComponentSettings = (
+  comp: UntypedManifestComponent
+): void => {
+  const settings = comp.settings as
+    | Partial<SideMenuComponentSettings>
+    | undefined;
+
+  if (!settings) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.SIDE_MENU}) is missing required settings`
+    );
+  }
+
+  if (!settings.icon) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.SIDE_MENU}) setting "icon" must be a string`
+    );
+  }
+
+  if (!settings.width) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.SIDE_MENU}) setting "width" must be a S | M | L`
+    );
+  }
+
+  if (
+    settings.width !== "S" &&
+    settings.width !== "M" &&
+    settings.width !== "L"
+  ) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.SIDE_MENU}) setting "width" must be a S | M | L`
+    );
+  }
+};
+
 const validateComponentSettings = (comp: UntypedManifestComponent): void => {
   switch (comp.type) {
     case COMPONENT_TYPE.RECORD:
@@ -119,6 +156,9 @@ const validateComponentSettings = (comp: UntypedManifestComponent): void => {
       break;
     case COMPONENT_TYPE.GLOBAL_MENU:
       validateGlobalMenuComponentSettings(comp);
+      break;
+    case COMPONENT_TYPE.SIDE_MENU:
+      validateSideMenuComponentSettings(comp);
       break;
     default:
       throw new Error(
