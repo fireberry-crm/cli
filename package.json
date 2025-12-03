@@ -41,7 +41,7 @@
     "access": "public"
   },
   "dependencies": {
-    "axios": "^1.12.2",
+    "axios": "^1.13.2",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "dotenv": "^17.2.3",
