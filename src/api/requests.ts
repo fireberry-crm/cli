@@ -35,7 +35,7 @@ export const installApp = async (manifest: Manifest): Promise<void> => {
 export const deleteApp = async (manifest: Manifest): Promise<void> => {
   const url = `/services/developer/delete`;
   try {
-    await api.delete<void>(url, manifest);
+    await api.delete<void>(url, { manifest });
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }
