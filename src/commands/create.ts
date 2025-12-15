@@ -50,7 +50,7 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
   const spinner = ora(`Creating app "${chalk.cyan(appName)}"...`).start();
 
   try {
-    await createApp({ appId });
+    await createApp({ appId, componentId });
 
     await fs.ensureDir(appDir);
 

@@ -13,11 +13,12 @@ export const createApp = async (data: CreateAppRequest): Promise<void> => {
 
 export const pushComponents = async (
   appId: string,
-  components: ZippedComponent[]
+  components: ZippedComponent[],
+  manifest: Manifest
 ): Promise<void> => {
   const url = `/services/developer/push`;
   try {
-    await api.post<void>(url, { appId, components });
+    await api.post<void>(url, { appId, components, manifest });
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }
@@ -26,7 +27,7 @@ export const pushComponents = async (
 export const installApp = async (manifest: Manifest): Promise<void> => {
   const url = `/services/developer/install`;
   try {
-    await api.post<void>(url, { manifest });
+    await api.post<void>(url, { manifest }, { timeout: 300000 }); // 5 minutes
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }

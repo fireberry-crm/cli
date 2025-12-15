@@ -2,6 +2,7 @@ import { COMPONENT_TYPE } from "../constants/component-types.js";
 
 export interface CreateAppRequest {
   appId: string;
+  componentId: string;
 }
 
 export interface ApiError {
