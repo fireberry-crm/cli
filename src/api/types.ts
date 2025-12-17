@@ -27,6 +27,7 @@ export interface RecordComponentSettings {
   iconName: string;
   iconColor: string;
   objectType: number;
+  height: "S" | "M" | "L" | "XL";
 }
 
 export interface GlobalMenuComponentSettings {

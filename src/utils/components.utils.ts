@@ -59,6 +59,7 @@ const validateRecordComponentSettings = (
     "iconName",
     "iconColor",
     "objectType",
+    "height",
   ];
 
   for (const fieldName of requiredFields) {
@@ -84,6 +85,22 @@ const validateRecordComponentSettings = (
   if (typeof settings.objectType !== "number") {
     throw new Error(
       `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "objectType" must be a number`
+    );
+  }
+  if (!settings.height) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "height" must be a S | M | L | XL`
+    );
+  }
+
+  if (
+    settings.height !== "S" &&
+    settings.height !== "M" &&
+    settings.height !== "L" &&
+    settings.height !== "XL"
+  ) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "height" must be a S | M | L | XL`
     );
   }
 };
