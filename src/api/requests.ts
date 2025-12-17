@@ -4,7 +4,7 @@ import { api } from "./axios.js";
 import type { Manifest, ZippedComponent } from "./types.js";
 
 export const createApp = async (manifest: Manifest): Promise<void> => {
-  const url = "/services/developer/create";
+  const url = `${BASE_SERVICE_URL}/create`;
   try {
     await api.post<void>(url, { manifest });
   } catch (error) {
