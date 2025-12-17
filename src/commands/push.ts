@@ -30,7 +30,7 @@ export async function runPush(): Promise<void> {
 
       spinner.start("Uploading to Fireberry...");
 
-      await pushComponents(manifest.app.id, zippedComponents);
+      await pushComponents(manifest.app.id, zippedComponents, manifest);
       spinner.succeed("Components pushed successfully");
     } else {
       spinner.succeed("No components to push");

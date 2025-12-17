@@ -14,12 +14,13 @@ import {
 } from "../api/types.js";
 import { COMPONENT_TYPE } from "../constants/component-types.js";
 
-export const getManifest = async (): Promise<Manifest> => {
-  const manifestPath = path.join(process.cwd(), "manifest.yml");
+export const getManifest = async (basePath?: string): Promise<Manifest> => {
+  const manifestPath = path.join(basePath || process.cwd(), "manifest.yml");
+  const searchDir = basePath || process.cwd();
 
   if (!(await fs.pathExists(manifestPath))) {
     throw new Error(
-      `No manifest.yml found at ${chalk.yellow(process.cwd())}.\n` +
+      `No manifest.yml found at ${chalk.yellow(searchDir)}.\n` +
         `Please run this command from your Fireberry app directory.`
     );
   }
