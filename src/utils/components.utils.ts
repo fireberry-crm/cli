@@ -93,12 +93,7 @@ const validateRecordComponentSettings = (
     );
   }
 
-  if (
-    settings.height !== "S" &&
-    settings.height !== "M" &&
-    settings.height !== "L" &&
-    settings.height !== "XL"
-  ) {
+  if (!["S", "M", "L", "XL"].includes(settings.height)) {
     throw new Error(
       `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "height" must be a S | M | L | XL`
     );
