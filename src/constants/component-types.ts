@@ -6,3 +6,5 @@ export const COMPONENT_TYPE = {
 
 export type ComponentType =
   (typeof COMPONENT_TYPE)[keyof typeof COMPONENT_TYPE];
+
+export const BASE_SERVICE_URL = "/services/developer/app";

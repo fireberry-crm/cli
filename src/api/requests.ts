@@ -1,6 +1,7 @@
 import "../config/env.js";
+import { BASE_SERVICE_URL } from "../constants/component-types.js";
 import { api } from "./axios.js";
-import type { CreateAppRequest, Manifest, ZippedComponent } from "./types.js";
+import type { Manifest, ZippedComponent } from "./types.js";
 
 export const createApp = async (manifest: Manifest): Promise<void> => {
   const url = "/services/developer/create";
@@ -16,7 +17,7 @@ export const pushComponents = async (
   components: ZippedComponent[],
   manifest: Manifest
 ): Promise<void> => {
-  const url = `/services/developer/push`;
+  const url = `${BASE_SERVICE_URL}/push`;
   try {
     await api.post<void>(url, { appId, components, manifest });
   } catch (error) {
@@ -25,7 +26,7 @@ export const pushComponents = async (
 };
 
 export const installApp = async (manifest: Manifest): Promise<void> => {
-  const url = `/services/developer/install`;
+  const url = `${BASE_SERVICE_URL}/install`;
   try {
     await api.post<void>(url, { manifest }, { timeout: 300000 }); // 5 minutes
   } catch (error) {
@@ -34,7 +35,7 @@ export const installApp = async (manifest: Manifest): Promise<void> => {
 };
 
 export const deleteApp = async (manifest: Manifest): Promise<void> => {
-  const url = `/services/developer/delete`;
+  const url = `${BASE_SERVICE_URL}/delete`;
   try {
     await api.delete<void>(url, { manifest });
   } catch (error) {
