@@ -1,4 +1,5 @@
 import { COMPONENT_TYPE } from "../constants/component-types.js";
+import { HeightOption } from "../constants/height-options.js";
 
 export interface CreateAppRequest {
   appId: string;
@@ -27,7 +28,7 @@ export interface RecordComponentSettings {
   iconName: string;
   iconColor: string;
   objectType: number;
-  height: "S" | "M" | "L" | "XL";
+  height: HeightOption;
 }
 
 export interface GlobalMenuComponentSettings {
