@@ -13,6 +13,7 @@ import {
   SideMenuComponentSettings,
 } from "../api/types.js";
 import { COMPONENT_TYPE } from "../constants/component-types.js";
+import { HEIGHT_OPTIONS } from "../constants/height-options.js";
 
 export const getManifest = async (basePath?: string): Promise<Manifest> => {
   const manifestPath = path.join(basePath || process.cwd(), "manifest.yml");
@@ -59,6 +60,7 @@ const validateRecordComponentSettings = (
     "iconName",
     "iconColor",
     "objectType",
+    "height",
   ];
 
   for (const fieldName of requiredFields) {
@@ -84,6 +86,17 @@ const validateRecordComponentSettings = (
   if (typeof settings.objectType !== "number") {
     throw new Error(
       `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "objectType" must be a number`
+    );
+  }
+  if (!settings.height) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "height" must be one of: ${HEIGHT_OPTIONS.join(" | ")}`
+    );
+  }
+
+  if (!HEIGHT_OPTIONS.includes(settings.height as any)) {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "height" must be one of: ${HEIGHT_OPTIONS.join(" | ")}`
     );
   }
 };
