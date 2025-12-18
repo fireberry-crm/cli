@@ -90,13 +90,17 @@ const validateRecordComponentSettings = (
   }
   if (!settings.height) {
     throw new Error(
-      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "height" must be one of: ${HEIGHT_OPTIONS.join(" | ")}`
+      `Component "${comp.title}" (type: ${
+        COMPONENT_TYPE.RECORD
+      }) setting "height" must be one of: ${HEIGHT_OPTIONS.join(" | ")}`
     );
   }
 
   if (!HEIGHT_OPTIONS.includes(settings.height as any)) {
     throw new Error(
-      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "height" must be one of: ${HEIGHT_OPTIONS.join(" | ")}`
+      `Component "${comp.title}" (type: ${
+        COMPONENT_TYPE.RECORD
+      }) setting "height" must be one of: ${HEIGHT_OPTIONS.join(" | ")}`
     );
   }
 };
@@ -140,9 +144,9 @@ const validateSideMenuComponentSettings = (
     );
   }
 
-  if (!settings.icon) {
+  if (!settings.iconName) {
     throw new Error(
-      `Component "${comp.title}" (type: ${COMPONENT_TYPE.SIDE_MENU}) setting "icon" must be a string`
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.SIDE_MENU}) setting "iconName" must be a string`
     );
   }
 
