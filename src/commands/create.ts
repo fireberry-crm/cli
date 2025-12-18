@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import ora from "ora";
 import chalk from "chalk";
 import { createApp } from "../api/requests.js";
+import { getManifest } from "../utils/components.utils.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,8 +51,6 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
   const spinner = ora(`Creating app "${chalk.cyan(appName)}"...`).start();
 
   try {
-    await createApp({ appId });
-
     await fs.ensureDir(appDir);
 
     const templatesDir = path.join(__dirname, "..", "..", "src", "templates");
@@ -73,6 +72,9 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
 
     await fs.writeFile(path.join(appDir, "manifest.yml"), manifestContent);
     await fs.writeFile(path.join(appDir, "index.html"), htmlContent);
+    const manifest = await getManifest(appDir);
+
+    await createApp(manifest);
 
     spinner.succeed(`Successfully created "${chalk.cyan(appName)}" app!`);
     console.log(chalk.gray(`📁 Location: ${appDir}`));

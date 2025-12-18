@@ -6,6 +6,7 @@ import { runCreate } from "../commands/create.js";
 import packageJson from "../../package.json" with { type: "json" };
 import { runPush } from "../commands/push.js";
 import { runInstall } from "../commands/install.js";
+import { runDelete } from "../commands/delete.js";
 
 const program = new Command();
 
@@ -38,11 +39,18 @@ program
     await runPush();
   });
 
-  program.command("install")
+program.command("install")
     .description("Install app on your Fireberry account")
     .action(async () => {
       await runInstall();
     });
+
+program
+  .command("delete")
+  .description("Delete a Fireberry app")
+  .action(async () => {
+    await runDelete();
+  });
 
 program.parseAsync(process.argv).catch((err: unknown) => {
   const errorMessage = err instanceof Error 

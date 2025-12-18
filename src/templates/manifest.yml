@@ -11,3 +11,4 @@ components:
       iconName: "related-single"
       iconColor: "#7aae7f"
       objectType: 0
+      height: "M"
