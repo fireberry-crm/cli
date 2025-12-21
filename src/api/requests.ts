@@ -43,28 +43,14 @@ export const deleteApp = async (manifest: Manifest): Promise<void> => {
   }
 };
 
-export const startDebug = async (
-  appId: string,
+export const updateDebug = async (
   componentId: string,
-  debugUrl: string,
-  manifest: Manifest
+  manifest: Manifest,
+  debugUrl?: string
 ): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/debug`;
   try {
-    await api.post<void>(url, { appId, componentId, debugUrl, manifest });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Unknown error");
-  }
-};
-
-export const stopDebug = async (
-  appId: string,
-  componentId: string,
-  manifest: Manifest
-): Promise<void> => {
-  const url = `${BASE_SERVICE_URL}/debug`;
-  try {
-    await api.delete<void>(url, { appId, componentId, manifest });
+    await api.post<void>(url, { componentId, debugUrl, manifest });
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }

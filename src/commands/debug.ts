@@ -1,6 +1,6 @@
 import ora from "ora";
 import chalk from "chalk";
-import { startDebug, stopDebug } from "../api/requests.js";
+import { updateDebug } from "../api/requests.js";
 import { getManifest } from "../utils/components.utils.js";
 
 function validateDebugUrl(url: string): void {
@@ -45,14 +45,14 @@ export async function runDebug(
     validateComponentExists(manifest, componentId);
 
     if (options?.stop) {
-      // Stop debugging
+      // Stop debugging - send request without debugUrl
       spinner.start("Stopping debug mode...");
-      await stopDebug(manifest.app.id, componentId, manifest);
+      await updateDebug(componentId, manifest);
       spinner.succeed(
         chalk.green(`Debug mode stopped for component: ${componentId}`)
       );
     } else {
-      // Start debugging
+      // Start debugging - send request with debugUrl
       if (!url) {
         throw new Error(
           "URL is required when starting debug mode.\n" +
@@ -63,7 +63,7 @@ export async function runDebug(
       validateDebugUrl(url);
 
       spinner.start(`Starting debug mode for component ${componentId}...`);
-      await startDebug(manifest.app.id, componentId, url, manifest);
+      await updateDebug(componentId, manifest, url);
       spinner.succeed(
         chalk.green(
           `Debug mode started!\n` +
