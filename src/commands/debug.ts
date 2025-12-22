@@ -2,7 +2,7 @@ import ora from "ora";
 import chalk from "chalk";
 import { updateDebug } from "../api/requests.js";
 import { getManifest } from "../utils/components.utils.js";
-import { Manifest } from "../api/types.js";
+import { Manifest, ManifestComponent } from "../api/types.js";
 
 function validateDebugUrl(url: string): void {
   const localhostPattern = /^localhost:\d+$/;
@@ -20,7 +20,8 @@ function validateComponentExists(
   componentId: string
 ): void {
   const component = manifest.components?.find(
-    (comp: any) => comp.id === componentId
+    (comp: ManifestComponent) =>
+      comp.id.toLowerCase() === componentId.toLowerCase()
   );
 
   if (!component) {
@@ -28,7 +29,7 @@ function validateComponentExists(
       `Component with ID "${componentId}" not found in manifest.\n` +
         `Available components:\n` +
         manifest.components
-          ?.map((comp: any) => `  - ${comp.title} (${comp.id})`)
+          ?.map((comp: ManifestComponent) => `  - ${comp.title} (${comp.id})`)
           .join("\n")
     );
   }
