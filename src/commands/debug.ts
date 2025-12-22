@@ -41,18 +41,15 @@ export async function runDebug(
     const manifest = await getManifest();
     spinner.succeed("Manifest loaded");
 
-    // Validate component exists
     validateComponentExists(manifest, componentId);
 
     if (options?.stop) {
-      // Stop debugging - send request without debugUrl
       spinner.start("Stopping debug mode...");
       await updateDebug(componentId, manifest);
       spinner.succeed(
         chalk.green(`Debug mode stopped for component: ${componentId}`)
       );
     } else {
-      // Start debugging - send request with debugUrl
       if (!url) {
         throw new Error(
           "URL is required when starting debug mode.\n" +
