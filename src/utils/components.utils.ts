@@ -125,6 +125,12 @@ const validateGlobalMenuComponentSettings = (
       `Component "${comp.title}" (type: ${COMPONENT_TYPE.GLOBAL_MENU}) setting "displayName" must be a string`
     );
   }
+
+  if (settings.iconName && typeof settings.iconName !== "string") {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.GLOBAL_MENU}) setting "iconName" must be a string`
+    );
+  }
 };
 
 const validateSideMenuComponentSettings = (

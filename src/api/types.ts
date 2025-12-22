@@ -33,6 +33,7 @@ export interface RecordComponentSettings {
 
 export interface GlobalMenuComponentSettings {
   displayName: string;
+  iconName?: string;
 }
 
 export interface SideMenuComponentSettings {
