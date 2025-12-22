@@ -2,6 +2,7 @@ import ora from "ora";
 import chalk from "chalk";
 import { updateDebug } from "../api/requests.js";
 import { getManifest } from "../utils/components.utils.js";
+import { Manifest } from "../api/types.js";
 
 function validateDebugUrl(url: string): void {
   const localhostPattern = /^localhost:\d+$/;
@@ -14,7 +15,10 @@ function validateDebugUrl(url: string): void {
   }
 }
 
-function validateComponentExists(manifest: any, componentId: string): void {
+function validateComponentExists(
+  manifest: Manifest,
+  componentId: string
+): void {
   const component = manifest.components?.find(
     (comp: any) => comp.id === componentId
   );
