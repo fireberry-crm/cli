@@ -13,7 +13,7 @@ import {
   SideMenuComponentSettings,
 } from "../api/types.js";
 import { COMPONENT_TYPE } from "../constants/component-types.js";
-import { HEIGHT_OPTIONS } from "../constants/height-options.js";
+import { HEIGHT_OPTIONS, HeightOption } from "../constants/height-options.js";
 
 export const getManifest = async (basePath?: string): Promise<Manifest> => {
   const manifestPath = path.join(basePath || process.cwd(), "manifest.yml");
@@ -90,13 +90,17 @@ const validateRecordComponentSettings = (
   }
   if (!settings.height) {
     throw new Error(
-      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "height" must be one of: ${HEIGHT_OPTIONS.join(" | ")}`
+      `Component "${comp.title}" (type: ${
+        COMPONENT_TYPE.RECORD
+      }) setting "height" must be one of: ${HEIGHT_OPTIONS.join(" | ")}`
     );
   }
 
-  if (!HEIGHT_OPTIONS.includes(settings.height as any)) {
+  if (!HEIGHT_OPTIONS.includes(settings.height as HeightOption)) {
     throw new Error(
-      `Component "${comp.title}" (type: ${COMPONENT_TYPE.RECORD}) setting "height" must be one of: ${HEIGHT_OPTIONS.join(" | ")}`
+      `Component "${comp.title}" (type: ${
+        COMPONENT_TYPE.RECORD
+      }) setting "height" must be one of: ${HEIGHT_OPTIONS.join(" | ")}`
     );
   }
 };
@@ -125,6 +129,12 @@ const validateGlobalMenuComponentSettings = (
       `Component "${comp.title}" (type: ${COMPONENT_TYPE.GLOBAL_MENU}) setting "displayName" must be a string`
     );
   }
+
+  if (settings.iconName && typeof settings.iconName !== "string") {
+    throw new Error(
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.GLOBAL_MENU}) setting "iconName" must be a string`
+    );
+  }
 };
 
 const validateSideMenuComponentSettings = (
@@ -140,9 +150,9 @@ const validateSideMenuComponentSettings = (
     );
   }
 
-  if (!settings.icon) {
+  if (!settings.iconName) {
     throw new Error(
-      `Component "${comp.title}" (type: ${COMPONENT_TYPE.SIDE_MENU}) setting "icon" must be a string`
+      `Component "${comp.title}" (type: ${COMPONENT_TYPE.SIDE_MENU}) setting "iconName" must be a string`
     );
   }
 
