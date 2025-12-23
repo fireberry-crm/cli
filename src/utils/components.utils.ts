@@ -13,7 +13,7 @@ import {
   SideMenuComponentSettings,
 } from "../api/types.js";
 import { COMPONENT_TYPE } from "../constants/component-types.js";
-import { HEIGHT_OPTIONS } from "../constants/height-options.js";
+import { HEIGHT_OPTIONS, HeightOption } from "../constants/height-options.js";
 
 export const getManifest = async (basePath?: string): Promise<Manifest> => {
   const manifestPath = path.join(basePath || process.cwd(), "manifest.yml");
@@ -96,7 +96,7 @@ const validateRecordComponentSettings = (
     );
   }
 
-  if (!HEIGHT_OPTIONS.includes(settings.height as any)) {
+  if (!HEIGHT_OPTIONS.includes(settings.height as HeightOption)) {
     throw new Error(
       `Component "${comp.title}" (type: ${
         COMPONENT_TYPE.RECORD

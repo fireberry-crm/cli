@@ -7,6 +7,7 @@ import packageJson from "../../package.json" with { type: "json" };
 import { runPush } from "../commands/push.js";
 import { runInstall } from "../commands/install.js";
 import { runDelete } from "../commands/delete.js";
+import { runDebug } from "../commands/debug.js";
 
 const program = new Command();
 
@@ -50,6 +51,16 @@ program
   .description("Delete a Fireberry app")
   .action(async () => {
     await runDelete();
+  });
+
+program
+  .command("debug")
+  .argument("<component-id>", "Component ID to debug")
+  .argument("[url]", "Debug URL in format localhost:[port]")
+  .option("--stop", "Stop debugging the component")
+  .description("Start or stop debugging a component")
+  .action(async (componentId: string, url?: string, options?: { stop?: boolean }) => {
+    await runDebug(componentId, url, options);
   });
 
 program.parseAsync(process.argv).catch((err: unknown) => {
