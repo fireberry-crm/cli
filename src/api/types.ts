@@ -37,7 +37,7 @@ export interface GlobalMenuComponentSettings {
 }
 
 export interface SideMenuComponentSettings {
-  icon: string;
+  iconName: string;
   width: "S" | "M" | "L";
 }
 

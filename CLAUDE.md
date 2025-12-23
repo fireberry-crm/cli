@@ -107,7 +107,7 @@ Component utilities in [src/utils/components.utils.ts](src/utils/components.util
         # For global-menu type:
         displayName: "Menu Name"
         # For side-menu type:
-        icon: "icon-name"
+        iconName: "icon-name"
         width: "S" | "M" | "L"
   ```
 
@@ -150,7 +150,7 @@ Component paths in manifest.yml are relative to the current working directory, n
 - **Component Settings Validation**: Each component type has required settings that are validated during `push`:
   - `record`: Must have `iconName`, `iconColor`, and `objectType`
   - `global-menu`: Must have `displayName`
-  - `side-menu`: Must have `icon` and `width` (S/M/L)
+  - `side-menu`: Must have `iconName` and `width` (S/M/L)
 - **Build Zipping**: Single files are wrapped in a directory before tar.gz creation
 - **Template Location**: Templates are resolved from `src/templates/` at compile time, copied to `dist/templates/`
 - **Delete Safety**: Delete command requires user confirmation before executing (cannot be undone)
