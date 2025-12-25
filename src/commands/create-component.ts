@@ -1,4 +1,4 @@
-import inquirer from "inquirer";
+import inquirer, { QuestionCollection } from "inquirer";
 import path from "node:path";
 import fs from "fs-extra";
 import { v4 as uuidv4 } from "uuid";
@@ -85,7 +85,7 @@ async function promptForSettings(
       ]);
       return {
         ...answers,
-        icon: "related-single",
+        iconName: "related-single",
       };
     }
     default:
@@ -100,8 +100,24 @@ export async function runCreateComponent({
   let componentName = name;
   let componentType = type;
 
+  const manifestPath = path.join(process.cwd(), "manifest.yml");
+  const manifest = await getManifest();
+
+  const components = manifest.components as unknown as
+    | UntypedManifestComponent[]
+    | undefined;
+
+  const existingComponent = components?.find(
+    (comp) => comp.title === componentName
+  );
+  if (existingComponent) {
+    throw new Error(
+      `Component with name "${componentName}" already exists in manifest.yml`
+    );
+  }
+
   if (!componentName || !componentType) {
-    const questions: any[] = [];
+    const questions: QuestionCollection<{ name: string; type: string }>[] = [];
 
     if (!componentName) {
       questions.push({
@@ -140,33 +156,15 @@ export async function runCreateComponent({
 
   const validatedType = validateComponentType(componentType);
 
-  const manifestPath = path.join(process.cwd(), "manifest.yml");
-  const manifest = await getManifest();
+  const spinner = ora();
 
   try {
-    const components = manifest.components as unknown as
-      | UntypedManifestComponent[]
-      | undefined;
-
-    const existingComponent = components?.find(
-      (comp) => comp.title === componentName
-    );
-    if (existingComponent) {
-      throw new Error(
-        `Component with name "${componentName}" already exists in manifest.yml`
-      );
-    }
-
-    console.log(
-      chalk.cyan(
-        `\nConfiguring settings for ${validatedType} component "${componentName}":\n`
-      )
-    );
     const componentSettings = await promptForSettings(validatedType);
 
-    let spinner = ora(
+    spinner.text = chalk.cyan(
       `Creating Vite React app for "${chalk.cyan(componentName)}"...`
-    ).start();
+    );
+    spinner.start();
 
     const componentDir = path.join(process.cwd(), "static", componentName);
     await fs.ensureDir(componentDir);
@@ -174,7 +172,7 @@ export async function runCreateComponent({
     // Create Vite app with React template
     spinner.text = `Running npm create vite@latest...`;
     const viteResult = spawnSync(
-      ` npm create vite@latest ${componentName} -- --template react  --no-interactive`,
+      `npm create vite@latest ${componentName} -- --template react --no-interactive`,
       {
         cwd: path.join(process.cwd(), "static"),
         stdio: "inherit",
@@ -183,9 +181,8 @@ export async function runCreateComponent({
     );
 
     if (viteResult.error || viteResult.status !== 0) {
-      spinner.fail(`Failed to create Vite app`);
       throw new Error(
-        `Vite creation failed: ${
+        `Failed to create Vite app: ${
           viteResult.error?.message || `Exit code ${viteResult.status}`
         }`
       );
@@ -199,12 +196,7 @@ export async function runCreateComponent({
     });
 
     if (installResult.error || installResult.status !== 0) {
-      spinner.fail(`Failed to install dependencies`);
-      throw new Error(
-        `npm install failed: ${
-          installResult.error?.message || `Exit code ${installResult.status}`
-        }`
-      );
+      throw new Error("Failed to install dependencies");
     }
 
     spinner.text = `Installing Fireberry packages...`;
@@ -218,13 +210,7 @@ export async function runCreateComponent({
     );
 
     if (fireberryResult.error || fireberryResult.status !== 0) {
-      spinner.fail(`Failed to install Fireberry packages`);
-      throw new Error(
-        `Fireberry packages installation failed: ${
-          fireberryResult.error?.message ||
-          `Exit code ${fireberryResult.status}`
-        }`
-      );
+      throw new Error("Failed to install Fireberry packages");
     }
     spinner.text = `Configuring component...`;
 
@@ -250,12 +236,7 @@ export async function runCreateComponent({
     });
 
     if (buildResult.error || buildResult.status !== 0) {
-      spinner.fail(`Failed to build component`);
-      throw new Error(
-        `npm run build failed: ${
-          buildResult.error?.message || `Exit code ${buildResult.status}`
-        }`
-      );
+      throw new Error("Failed to build component");
     }
 
     spinner.text = `Adding component to manifest...`;
@@ -298,9 +279,9 @@ export async function runCreateComponent({
     console.log(chalk.white(`   npm run build  # Build for production`));
   } catch (error) {
     if (error instanceof Error) {
-      console.error(chalk.red(`Failed to add component: ${error.message}`));
+      spinner.fail(chalk.red(`Failed to add component: ${error.message}`));
     } else {
-      console.error(
+      spinner.fail(
         chalk.red(
           `Failed to add component "${chalk.cyan(componentName || "unknown")}"`
         )
