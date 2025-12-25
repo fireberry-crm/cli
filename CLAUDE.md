@@ -58,6 +58,7 @@ Each CLI command is in [src/commands/](src/commands/):
 
 - **init**: Stores Fireberry API token in local config using `env-paths`
 - **create**: Creates new Fireberry app from templates with generated UUIDs
+- **create-component**: Scaffolds new Vite React component, installs Fireberry packages, builds it, and adds to manifest
 - **push**: Validates manifest, zips components, uploads to Fireberry API
 - **install**: Installs app on user's Fireberry account
 - **delete**: Deletes app from Fireberry platform (requires confirmation)
@@ -117,6 +118,42 @@ Templates use mustache-style placeholders (`{{appName}}`, `{{appId}}`, `{{compon
 
 - **manifest.yml**: Default manifest with single component
 - **index.html**: Basic HTML template
+- **App-record.jsx**: React component template for record-type components
+- **App-other.jsx**: React component template for global-menu and side-menu components
+
+### Create Component Command
+
+The `create-component` command ([src/commands/create-component.ts](src/commands/create-component.ts)) scaffolds a new React component within an existing Fireberry app:
+
+**Usage**: `fireberry create-component [name] [--type <type>]`
+
+**Process**:
+
+1. Validates component name doesn't already exist in manifest.yml
+2. Prompts for component type if not provided (record, global-menu, side-menu)
+3. Prompts for type-specific settings:
+   - **record**: objectType (number), height (S/M/L), sets default iconName and iconColor
+   - **global-menu**: displayName, sets default iconName
+   - **side-menu**: width (S/M/L), sets default iconName
+4. Creates Vite React app in `static/<componentName>` using `npm create vite@latest`
+5. Installs standard dependencies with `npm install`
+6. Installs Fireberry packages: `@fireberry/ds` and `@fireberry/sdk`
+7. Copies appropriate App.jsx template based on component type
+8. Builds the component with `npm run build`
+9. Generates UUID for component
+10. Adds component entry to manifest.yml with path `static/<componentName>/dist`
+11. Displays success message with component details and next steps
+
+**Requirements**:
+
+- Must be run from directory containing `manifest.yml`
+- Component name must be unique within the app
+
+**Output**:
+
+- Creates component directory at `static/<componentName>/`
+- Updates manifest.yml with new component entry
+- Built component ready at `static/<componentName>/dist/`
 
 ## Key Patterns
 
@@ -144,13 +181,14 @@ Component paths in manifest.yml are relative to the current working directory, n
 
 ## Important Notes
 
-- **Manifest Required**: `push`, `install`, and `delete` commands must be run from a directory containing `manifest.yml`
-- **Token Required**: Most commands require prior `init` to store API token
+- **Manifest Required**: `push`, `install`, `delete`, and `create-component` commands must be run from a directory containing `manifest.yml`
+- **Token Required**: Most commands (`push`, `install`, `delete`) require prior `init` to store API token
 - **Component IDs**: Must be unique UUIDs within a manifest
 - **Component Settings Validation**: Each component type has required settings that are validated during `push`:
   - `record`: Must have `iconName`, `iconColor`, and `objectType`
   - `global-menu`: Must have `displayName`
   - `side-menu`: Must have `iconName` and `width` (S/M/L)
+- **Component Creation**: `create-component` automatically scaffolds a Vite React app, installs `@fireberry/ds` and `@fireberry/sdk`, builds it, and adds it to the manifest
 - **Build Zipping**: Single files are wrapped in a directory before tar.gz creation
 - **Template Location**: Templates are resolved from `src/templates/` at compile time, copied to `dist/templates/`
 - **Delete Safety**: Delete command requires user confirmation before executing (cannot be undone)
