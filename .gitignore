@@ -18,6 +18,7 @@ build/
 # Debug
 .npm
 .eslintcache
+apps
 
 # Development docs
 DEVELOPMENT.md

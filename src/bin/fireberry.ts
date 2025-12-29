@@ -8,6 +8,7 @@ import { runPush } from "../commands/push.js";
 import { runInstall } from "../commands/install.js";
 import { runDelete } from "../commands/delete.js";
 import { runDebug } from "../commands/debug.js";
+import { runCreateComponent } from "../commands/create-component.js";
 
 const program = new Command();
 
@@ -32,6 +33,15 @@ program
     const name = nameArgs ? nameArgs.join("-") : undefined;
         await runCreate({ name });
   });
+
+program
+  .command("create-component")
+  .argument("[name]", "Component name")
+  .argument("[type]", "Component type (record, global-menu, side-menu)")
+  .description("Add a new component to the existing app manifest")
+  .action(async (name, type) => {
+   await runCreateComponent({ name, type });
+});
 
 program
   .command("push")
