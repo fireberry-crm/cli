@@ -18,9 +18,17 @@ const __dirname = path.dirname(__filename);
 interface CreateComponentOptions {
   name?: string;
   type?: string;
+  showSuccessMessage?: boolean;
 }
 
 const VALID_COMPONENT_TYPES = Object.values(COMPONENT_TYPE);
+
+function sanitizeComponentName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 function validateComponentType(type: string): ComponentType {
   if (!VALID_COMPONENT_TYPES.includes(type as ComponentType)) {
@@ -96,6 +104,7 @@ async function promptForSettings(
 export async function runCreateComponent({
   type,
   name,
+  showSuccessMessage = true,
 }: CreateComponentOptions): Promise<void> {
   let componentName = name;
   let componentType = type;
@@ -156,6 +165,8 @@ export async function runCreateComponent({
 
   const validatedType = validateComponentType(componentType);
 
+  const sanitizedName = sanitizeComponentName(componentName);
+
   const spinner = ora();
 
   try {
@@ -166,13 +177,12 @@ export async function runCreateComponent({
     );
     spinner.start();
 
-    const componentDir = path.join(process.cwd(), "static", componentName);
+    const componentDir = path.join(process.cwd(), "static", sanitizedName);
     await fs.ensureDir(componentDir);
 
-    // Create Vite app with React template
     spinner.text = `Running npm create vite@latest...`;
     const viteResult = spawnSync(
-      `npm create vite@latest ${componentName} -- --template react --no-interactive`,
+      `npm create vite@latest ${sanitizedName} -- --template react --no-interactive`,
       {
         cwd: path.join(process.cwd(), "static"),
         stdio: "inherit",
@@ -247,7 +257,7 @@ export async function runCreateComponent({
       type: validatedType,
       title: componentName,
       id: componentId,
-      path: `static/${componentName}/dist`,
+      path: `static/${sanitizedName}/dist`,
       settings: componentSettings,
     };
 
@@ -270,11 +280,17 @@ export async function runCreateComponent({
     spinner.succeed(
       `Successfully created component "${chalk.cyan(componentName)}"!`
     );
+
     console.log(chalk.gray(`Component ID: ${componentId}`));
     console.log(chalk.gray(`Type: ${validatedType}`));
-    console.log(chalk.gray(`Path: static/${componentName}/dist`));
-    console.log(chalk.green("\n🎉 Your component is ready!"));
-    console.log(chalk.white(`   cd static/${componentName}`));
+    console.log(chalk.gray(`Path: static/${sanitizedName}/dist`));
+    if (!showSuccessMessage) {
+      return;
+    }
+    console.log(
+      chalk.green(`\nYour component "${chalk.cyan(componentName)}" is ready!`)
+    );
+    console.log(chalk.white(`   cd static/${sanitizedName}`));
     console.log(chalk.white(`   npm run dev    # Start development server`));
     console.log(chalk.white(`   npm run build  # Build for production`));
   } catch (error) {
