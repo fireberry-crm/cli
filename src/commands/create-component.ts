@@ -18,7 +18,6 @@ const __dirname = path.dirname(__filename);
 interface CreateComponentOptions {
   name?: string;
   type?: string;
-  showSuccessMessage?: boolean;
 }
 
 const VALID_COMPONENT_TYPES = Object.values(COMPONENT_TYPE);
@@ -104,7 +103,6 @@ async function promptForSettings(
 export async function runCreateComponent({
   type,
   name,
-  showSuccessMessage = true,
 }: CreateComponentOptions): Promise<void> {
   let componentName = name;
   let componentType = type;
@@ -284,9 +282,7 @@ export async function runCreateComponent({
     console.log(chalk.gray(`Component ID: ${componentId}`));
     console.log(chalk.gray(`Type: ${validatedType}`));
     console.log(chalk.gray(`Path: static/${sanitizedName}/dist`));
-    if (!showSuccessMessage) {
-      return;
-    }
+
     console.log(
       chalk.green(`\nYour component "${chalk.cyan(componentName)}" is ready!`)
     );
