@@ -166,7 +166,7 @@ export async function runCreateComponent({
     );
     spinner.start();
 
-    const componentDir = path.join(process.cwd(), "static", componentName);
+    const componentDir = path.join(process.cwd(), componentName);
     await fs.ensureDir(componentDir);
 
     // Create Vite app with React template
@@ -174,7 +174,7 @@ export async function runCreateComponent({
     const viteResult = spawnSync(
       `npm create vite@latest ${componentName} -- --template react --no-interactive`,
       {
-        cwd: path.join(process.cwd(), "static"),
+        cwd: process.cwd(),
         stdio: "inherit",
         shell: true,
       }
@@ -247,7 +247,7 @@ export async function runCreateComponent({
       type: validatedType,
       title: componentName,
       id: componentId,
-      path: `static/${componentName}/dist`,
+      path: `${componentName}/dist`,
       settings: componentSettings,
     };
 
@@ -272,9 +272,9 @@ export async function runCreateComponent({
     );
     console.log(chalk.gray(`Component ID: ${componentId}`));
     console.log(chalk.gray(`Type: ${validatedType}`));
-    console.log(chalk.gray(`Path: static/${componentName}/dist`));
+    console.log(chalk.gray(`Path: ${componentName}/dist`));
     console.log(chalk.green("\n🎉 Your component is ready!"));
-    console.log(chalk.white(`   cd static/${componentName}`));
+    console.log(chalk.white(`   cd ${componentName}`));
     console.log(chalk.white(`   npm run dev    # Start development server`));
     console.log(chalk.white(`   npm run build  # Build for production`));
   } catch (error) {
