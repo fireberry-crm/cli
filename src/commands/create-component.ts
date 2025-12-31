@@ -103,19 +103,6 @@ export async function runCreateComponent({
   const manifestPath = path.join(process.cwd(), "manifest.yml");
   const manifest = await getManifest();
 
-  const components = manifest.components as unknown as
-    | UntypedManifestComponent[]
-    | undefined;
-
-  const existingComponent = components?.find(
-    (comp) => comp.title === componentName
-  );
-  if (existingComponent) {
-    throw new Error(
-      `Component with name "${componentName}" already exists in manifest.yml`
-    );
-  }
-
   if (!componentName || !componentType) {
     const questions: QuestionCollection<{ name: string; type: string }>[] = [];
 
@@ -152,6 +139,19 @@ export async function runCreateComponent({
 
   if (!componentType) {
     throw new Error("Missing component type.");
+  }
+
+  const components = manifest.components as unknown as
+    | UntypedManifestComponent[]
+    | undefined;
+
+  const existingComponent = components?.find(
+    (comp) => comp.title === componentName
+  );
+  if (existingComponent) {
+    throw new Error(
+      `Component with name "${componentName}" already exists in manifest.yml`
+    );
   }
 
   const validatedType = validateComponentType(componentType);
