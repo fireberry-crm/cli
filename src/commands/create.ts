@@ -2,12 +2,12 @@ import inquirer from "inquirer";
 import path from "node:path";
 import fs from "fs-extra";
 import { v4 as uuidv4 } from "uuid";
-import { spawnSync } from "node:child_process";
 import yaml from "js-yaml";
 import ora from "ora";
 import chalk from "chalk";
 import { createApp } from "../api/requests.js";
 import { getManifest } from "../utils/components.utils.js";
+import { runCreateComponent } from "./create-component.js";
 
 interface CreateOptions {
   name?: string;
@@ -80,24 +80,7 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
 
     console.log(chalk.cyan(`\nAdding component "${componentName}"...`));
 
-    const createComponentResult = spawnSync(
-      "fireberry",
-      ["create-component", componentName],
-      {
-        stdio: "inherit",
-        shell: true,
-      }
-    );
-
-    if (createComponentResult.error || createComponentResult.status !== 0) {
-      throw new Error(
-        `Failed to create component: ${
-          createComponentResult.error?.message ||
-          `Exit code ${createComponentResult.status}`
-        }`
-      );
-    }
-
+    await runCreateComponent({ name: componentName });
     spinner.start();
     spinner.text = `Registering app with Fireberry...`;
     await createApp(await getManifest());
