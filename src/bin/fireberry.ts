@@ -15,7 +15,13 @@ const program = new Command();
 program
   .name("fireberry")
   .description("Fireberry developer CLI")
-  .version(packageJson.version);
+  .version(packageJson.version)
+  .configureOutput({
+    outputError: (str, write) => {
+      const formatted = str.replace(/^error:/i, 'Error:');
+      write(chalk.red(formatted));
+    }
+  });
 
 program
   .command("init")
@@ -27,11 +33,10 @@ program
 
 program
   .command("create")
-  .argument("[name...]", "App name")
-  .description("Create a new Fireberry app")
-  .action(async (nameArgs?: string[]) => {
-    const name = nameArgs ? nameArgs.join("-") : undefined;
-        await runCreate({ name });
+  .argument("[name]", "App name")
+  .description("Create a new Fireberry app with a component")
+  .action(async (name?: string) => {
+    await runCreate({ name });
   });
 
 program
