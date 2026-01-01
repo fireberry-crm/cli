@@ -175,14 +175,14 @@ export async function runCreateComponent({
     );
     spinner.start();
 
-    const componentDir = path.join(process.cwd(), "static", sanitizedName);
+    const componentDir = path.join(process.cwd(), componentName);
     await fs.ensureDir(componentDir);
 
     spinner.text = `Running npm create vite@latest...`;
     const viteResult = spawnSync(
       `npm create vite@latest ${sanitizedName} -- --template react --no-interactive`,
       {
-        cwd: path.join(process.cwd(), "static"),
+        cwd: process.cwd(),
         stdio: "inherit",
         shell: true,
       }
@@ -255,7 +255,7 @@ export async function runCreateComponent({
       type: validatedType,
       title: componentName,
       id: componentId,
-      path: `static/${sanitizedName}/dist`,
+      path: `${componentName}/dist`,
       settings: componentSettings,
     };
 
@@ -281,12 +281,12 @@ export async function runCreateComponent({
 
     console.log(chalk.gray(`Component ID: ${componentId}`));
     console.log(chalk.gray(`Type: ${validatedType}`));
-    console.log(chalk.gray(`Path: static/${sanitizedName}/dist`));
+    console.log(chalk.gray(`Path: ${sanitizedName}/dist`));
 
     console.log(
       chalk.green(`\nYour component "${chalk.cyan(componentName)}" is ready!`)
     );
-    console.log(chalk.white(`   cd static/${sanitizedName}`));
+    console.log(chalk.white(`   cd ${sanitizedName}`));
     console.log(chalk.white(`   npm run dev    # Start development server`));
     console.log(chalk.white(`   npm run build  # Build for production`));
   } catch (error) {
