@@ -125,6 +125,32 @@ jobs:
           git push origin --tags
           echo "Successfully pushed commit and tags"
 
+      - name: Sync dev branch with production version
+        if: steps.detect-type.outputs.type == 'production'
+        run: |
+          PROD_VERSION=${{ steps.version-prod.outputs.version }}
+          echo "Syncing dev branch to ${PROD_VERSION}-beta.0"
+
+          # Fetch latest dev branch
+          git fetch origin dev
+
+          # Checkout dev branch
+          git checkout dev
+          git pull origin dev
+
+          # Update version to production version with -beta.0 suffix
+          npm version ${PROD_VERSION}-beta.0 --no-git-tag-version --allow-same-version
+
+          # Commit and push to dev
+          git add package.json package-lock.json
+          git commit -m "chore: sync dev to v${PROD_VERSION}-beta.0 after production release [skip ci]"
+          git push origin dev
+
+          echo "Successfully synced dev branch to ${PROD_VERSION}-beta.0"
+
+          # Switch back to main branch
+          git checkout main
+
       - name: Publish to npm (Beta)
         if: steps.detect-type.outputs.type == 'beta'
         run: |
