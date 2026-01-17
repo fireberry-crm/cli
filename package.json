@@ -22,7 +22,7 @@
     "test": "node test/smoke.test.js",
     "version:beta": "npm version prerelease --preid=beta",
     "publish:beta": "npm run version:beta && npm publish --tag beta",
-    "publish:prod": "npm publish --tag latest"
+    "publish:prod": "npm version patch && npm publish --tag latest"
   },
   "keywords": [
     "cli",
