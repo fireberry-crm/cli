@@ -32,10 +32,41 @@ fireberry --help      # Test the linked CLI
 
 ### Publishing
 
+Releases are managed through GitHub Actions workflow with automatic version management:
+
+**Beta Releases (from `dev` branch):**
+1. Go to GitHub Actions → "Publish Fireberry CLI to npm"
+2. Click "Run workflow" and select `dev` branch
+3. Workflow automatically:
+   - Increments beta version (e.g., 0.4.1-beta.0 → 0.4.1-beta.1)
+   - Commits version change to git
+   - Creates git tag (v0.4.1-beta.1)
+   - Builds and tests
+   - Publishes to npm with `beta` tag
+
+**Production Releases (from `main` branch):**
+1. Merge `dev` → `main` after QA passes
+2. Go to GitHub Actions → "Publish Fireberry CLI to npm"
+3. Click "Run workflow" and select `main` branch
+4. Choose version bump type (patch/minor/major)
+5. Workflow automatically:
+   - Removes `-beta` suffix and bumps version
+   - Commits version change to git
+   - Creates git tag (v0.4.1)
+   - Builds and tests
+   - Publishes to npm with `latest` tag
+
+**Local Publishing (Emergency Hotfixes):**
 ```bash
 npm run publish:beta  # Version bump (beta) and publish to npm with beta tag
-npm run publish:prod  # Publish to npm with latest tag
+npm run publish:prod  # Version bump (patch) and publish to npm with latest tag
 ```
+
+**Key Features:**
+- No manual version editing required
+- Git tags automatically created for each release
+- Version consistency maintained between git and npm
+- `[skip ci]` in commit messages prevents workflow loops
 
 ## Architecture
 

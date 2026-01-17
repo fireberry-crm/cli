@@ -3,19 +3,11 @@ name: Publish Fireberry CLI to npm
 on:
   workflow_dispatch:
     inputs:
-      type:
-        description: "Publish type"
-        required: true
-        type: choice
-        options:
-          - beta
-          - production
       version:
-        description: "Version bump (for production only)"
+        description: "Version bump type (ignored for beta/dev branch)"
         required: false
         type: choice
         options:
-          - prerelease
           - patch
           - minor
           - major
@@ -25,11 +17,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write  # Enable pushing commits and tags
       id-token: write
     environment:
       name: npm
-      url: https://www.npmjs.com/package/@fireberry/cli/v/${{ github.event.inputs.version }}
 
     steps:
       - name: Checkout repository
@@ -46,19 +37,77 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Update version (Beta)
-        if: github.event.inputs.type == 'beta'
+      - name: Detect release type from branch
+        id: detect-type
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          echo "Branch: $BRANCH_NAME"
+          if [[ "$BRANCH_NAME" == "dev" ]]; then
+            echo "type=beta" >> $GITHUB_OUTPUT
+            echo "Detected release type: beta"
+          elif [[ "$BRANCH_NAME" == "main" ]]; then
+            echo "type=production" >> $GITHUB_OUTPUT
+            echo "Detected release type: production"
+          else
+            echo "Error: Workflow must be run from 'dev' or 'main' branch"
+            echo "Current branch: $BRANCH_NAME"
+            exit 1
+          fi
+
+      - name: Bump version (Beta)
+        if: steps.detect-type.outputs.type == 'beta'
+        id: version-beta
         run: |
           CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+
           if [[ $CURRENT_VERSION == *"-beta."* ]]; then
+            echo "Incrementing beta prerelease version"
             npm version prerelease --preid=beta --no-git-tag-version
           else
+            echo "Creating new beta version from production"
             npm version prepatch --preid=beta --no-git-tag-version
           fi
 
-      - name: Update version (Production)
-        if: github.event.inputs.type == 'production'
-        run: npm version ${{ github.event.inputs.version }} --no-git-tag-version
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "New version: $NEW_VERSION"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Bump version (Production)
+        if: steps.detect-type.outputs.type == 'production'
+        id: version-prod
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+
+          # Remove -beta suffix first if present
+          if [[ $CURRENT_VERSION == *"-beta."* ]]; then
+            echo "Removing beta suffix"
+            BASE_VERSION=$(echo $CURRENT_VERSION | sed 's/-beta\.[0-9]*$//')
+            echo "Base version: $BASE_VERSION"
+            npm version $BASE_VERSION --no-git-tag-version
+          fi
+
+          # Then apply the version bump
+          echo "Applying ${{ github.event.inputs.version }} bump"
+          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "New version: $NEW_VERSION"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit version bump
+        run: |
+          VERSION=${{ steps.version-beta.outputs.version || steps.version-prod.outputs.version }}
+          echo "Committing version: $VERSION"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to v${VERSION} [skip ci]"
+          git tag "v${VERSION}"
+
+          echo "Created commit and tag v${VERSION}"
 
       - name: Build package
         run: npm run build --if-present
@@ -69,10 +118,29 @@ jobs:
       - name: Update npm to latest version
         run: npm install -g npm@latest
 
+      - name: Push changes
+        run: |
+          echo "Pushing to branch: ${{ github.ref_name }}"
+          git push origin ${{ github.ref_name }}
+          git push origin --tags
+          echo "Successfully pushed commit and tags"
+
       - name: Publish to npm (Beta)
-        if: github.event.inputs.type == 'beta'
-        run: npm publish --tag beta --provenance --access public
+        if: steps.detect-type.outputs.type == 'beta'
+        run: |
+          VERSION=${{ steps.version-beta.outputs.version }}
+          echo "Publishing beta version $VERSION to npm"
+          npm publish --tag beta --provenance --access public
+          echo "Successfully published @fireberry/cli@$VERSION (beta tag)"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm (Production)
-        if: github.event.inputs.type == 'production'
-        run: npm publish --tag latest --provenance --access public
+        if: steps.detect-type.outputs.type == 'production'
+        run: |
+          VERSION=${{ steps.version-prod.outputs.version }}
+          echo "Publishing production version $VERSION to npm"
+          npm publish --tag latest --provenance --access public
+          echo "Successfully published @fireberry/cli@$VERSION (latest tag)"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
