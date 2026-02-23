@@ -5,6 +5,7 @@
   "type": "module",
   "author": "",
   "license": "MIT",
+  "preferGlobal": true,
   "bin": {
     "fireberry": "dist/bin/fireberry.js"
   },

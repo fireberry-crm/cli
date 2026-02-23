@@ -175,7 +175,7 @@ export async function runCreateComponent({
     );
     spinner.start();
 
-    const componentDir = path.join(process.cwd(), componentName);
+    const componentDir = path.join(process.cwd(), sanitizedName);
     await fs.ensureDir(componentDir);
 
     spinner.text = `Running npm create vite@latest...`;
@@ -255,7 +255,7 @@ export async function runCreateComponent({
       type: validatedType,
       title: componentName,
       id: componentId,
-      path: `${componentName}/dist`,
+      path: `${sanitizedName}/dist`,
       settings: componentSettings,
     };
 
