@@ -43,6 +43,15 @@ export const deleteApp = async (manifest: Manifest): Promise<void> => {
   }
 };
 
+export const deployApp = async (appId: string): Promise<void> => {
+  const url = `${BASE_SERVICE_URL}/deploy`;
+  try {
+    await api.post<void>(url, { appId });
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : "Unknown error");
+  }
+};
+
 export const updateDebug = async (
   componentId: string,
   manifest: Manifest,
