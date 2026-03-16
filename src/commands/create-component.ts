@@ -209,7 +209,7 @@ export async function runCreateComponent({
 
     spinner.text = `Installing Fireberry packages...`;
     const fireberryResult = spawnSync(
-      "npm install @fireberry/ds @fireberry/sdk",
+      "npm install @fireberry/ds@latest @fireberry/sdk@latest",
       {
         cwd: componentDir,
         stdio: "inherit",
