@@ -7,7 +7,7 @@ Fireberry CLI tool for managing your Fireberry application.
 Install the CLI globally using npm:
 
 ```bash
-npm install -g @fireberry/cli
+npm install -g @fireberry/cli@latest
 ```
 
 After installation, the `fireberry` command will be available in your terminal.
