@@ -9,6 +9,7 @@ import { runInstall } from "../commands/install.js";
 import { runDelete } from "../commands/delete.js";
 import { runDebug } from "../commands/debug.js";
 import { runCreateComponent } from "../commands/create-component.js";
+import { runDeploy } from "../commands/deploy.js";
 
 const program = new Command();
 
@@ -60,6 +61,13 @@ program.command("install")
     .action(async () => {
       await runInstall();
     });
+
+program
+  .command("deploy")
+  .description("Deploy app to Fireberry")
+  .action(async () => {
+    await runDeploy();
+  });
 
 program
   .command("delete")
