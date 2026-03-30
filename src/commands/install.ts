@@ -1,20 +1,16 @@
 import ora from "ora";
 import { installApp } from "../api/requests.js";
-import {
-  getManifest,
-  validateManifestComponents,
-} from "../utils/components.utils.js";
+import { getManifest } from "../utils/components.utils.js";
 
 export async function runInstall(): Promise<void> {
   const spinner = ora("Loading manifest...").start();
 
   try {
     const manifest = await getManifest();
-
-    await validateManifestComponents(manifest);
+    const appId = manifest.app.id;
 
     spinner.start("Installing app on Fireberry...");
-    await installApp(manifest);
+    await installApp(appId);
     spinner.succeed("App installed successfully");
   } catch (error) {
     spinner.fail("Installation failed");
