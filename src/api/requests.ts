@@ -25,10 +25,10 @@ export const pushComponents = async (
   }
 };
 
-export const installApp = async (manifest: Manifest): Promise<void> => {
+export const installApp = async (appId: string): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/install`;
   try {
-    await api.post<void>(url, { manifest }, { timeout: 300000 }); // 5 minutes
+    await api.post<void>(url, { appId }, { timeout: 300000 }); // 5 minutes
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }
