@@ -1,6 +1,7 @@
 import ora from "ora";
 import chalk from "chalk";
 import { getManifest, handleComponents } from "../utils/components.utils.js";
+import { validateAndReadIcon } from "../utils/app.utils.js";
 import { pushComponents } from "../api/requests.js";
 
 export async function runPush(): Promise<void> {
@@ -9,6 +10,15 @@ export async function runPush(): Promise<void> {
   try {
     const manifest = await getManifest();
     spinner.succeed("Manifest loaded successfully");
+
+    let icon: Buffer | undefined;
+
+    if (manifest.app.icon) {
+      spinner.start("Validating icon...");
+      icon = await validateAndReadIcon(manifest.app.icon);
+      const iconSizeKB = (icon.length / 1024).toFixed(2);
+      spinner.succeed(`Icon validated (${iconSizeKB} KB)`);
+    }
 
     spinner.start("Validating and zipping components...");
 
@@ -30,7 +40,7 @@ export async function runPush(): Promise<void> {
 
       spinner.start("Uploading to Fireberry...");
 
-      await pushComponents(manifest.app.id, zippedComponents, manifest);
+      await pushComponents(manifest.app.id, zippedComponents, manifest, icon);
       spinner.succeed("Components pushed successfully");
     } else {
       spinner.succeed("No components to push");

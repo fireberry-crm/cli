@@ -15,11 +15,12 @@ export const createApp = async (manifest: Manifest): Promise<void> => {
 export const pushComponents = async (
   appId: string,
   components: ZippedComponent[],
-  manifest: Manifest
+  manifest: Manifest,
+  icon?: Buffer
 ): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/push`;
   try {
-    await api.post<void>(url, { appId, components, manifest });
+    await api.post<void>(url, { appId, components, manifest, icon });
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }
