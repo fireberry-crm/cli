@@ -1,6 +1,5 @@
 import path from "node:path";
 import fs from "fs-extra";
-import chalk from "chalk";
 
 const VALID_ICON_EXTENSIONS = [".svg", ".png", ".jpg", ".jpeg"];
 const MAX_ICON_SIZE_BYTES = 500 * 1024;
@@ -11,7 +10,7 @@ export const validateAndReadIcon = async (
   const fullPath = path.resolve(process.cwd(), iconPath);
 
   if (!(await fs.pathExists(fullPath))) {
-    throw new Error(`Icon file not found: ${chalk.yellow(iconPath)}`);
+    throw new Error(`Icon file not found: ${iconPath}`);
   }
 
   const ext = path.extname(fullPath).toLowerCase();
@@ -29,5 +28,10 @@ export const validateAndReadIcon = async (
       ).toFixed(2)}KB`
     );
   }
+
+  if (buffer.length === 0) {
+    throw new Error("Icon file is empty");
+  }
+
   return buffer;
 };
