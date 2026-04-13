@@ -17,7 +17,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Enable pushing commits and tags
+      contents: write # Enable pushing commits and tags
       id-token: write
     environment:
       name: npm
@@ -114,9 +114,6 @@ jobs:
 
       - name: Run tests
         run: npm test
-
-      - name: Update npm to latest version
-        run: npm install -g npm@latest
 
       - name: Push changes
         run: |
