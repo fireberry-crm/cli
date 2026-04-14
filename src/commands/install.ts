@@ -7,10 +7,9 @@ export async function runInstall(): Promise<void> {
 
   try {
     const manifest = await getManifest();
-    const appId = manifest.app.id;
 
     spinner.start("Installing app on Fireberry...");
-    await installApp(appId);
+    await installApp(manifest);
     spinner.succeed("App installed successfully");
   } catch (error) {
     spinner.fail("Installation failed");

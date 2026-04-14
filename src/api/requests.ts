@@ -13,23 +13,22 @@ export const createApp = async (manifest: Manifest): Promise<void> => {
 };
 
 export const pushComponents = async (
-  appId: string,
   components: ZippedComponent[],
   manifest: Manifest,
   icon?: Buffer
 ): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/push`;
   try {
-    await api.post<void>(url, { appId, components, manifest, icon });
+    await api.post<void>(url, { components, manifest, icon });
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }
 };
 
-export const installApp = async (appId: string): Promise<void> => {
+export const installApp = async (manifest: Manifest): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/install`;
   try {
-    await api.post<void>(url, { appId }, { timeout: 300000 }); // 5 minutes
+    await api.post<void>(url, { manifest }, { timeout: 300000 }); // 5 minutes
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }
