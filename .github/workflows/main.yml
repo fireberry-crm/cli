@@ -34,6 +34,9 @@ jobs:
           cache: "npm"
           cache-dependency-path: ${{ github.workspace }}/package-lock.json
 
+      - name: Upgrade npm to latest stable
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         run: npm ci
 
@@ -155,8 +158,6 @@ jobs:
           echo "Publishing beta version $VERSION to npm"
           npm publish --tag beta --provenance --access public
           echo "Successfully published @fireberry/cli@$VERSION (beta tag)"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm (Production)
         if: steps.detect-type.outputs.type == 'production'
@@ -165,5 +166,3 @@ jobs:
           echo "Publishing production version $VERSION to npm"
           npm publish --tag latest --provenance --access public
           echo "Successfully published @fireberry/cli@$VERSION (latest tag)"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
