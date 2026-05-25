@@ -224,11 +224,7 @@ export async function runCreateComponent({
 
     const templatesDir = path.join(__dirname, "..", "..", "src", "templates");
 
-    // Choose the right App.jsx template based on component type
-    const appTemplateFile =
-      validatedType === COMPONENT_TYPE.RECORD
-        ? "App-record.jsx"
-        : "App-other.jsx";
+    const appTemplateFile = "App.jsx";
     const appTemplate = await fs.readFile(
       path.join(templatesDir, appTemplateFile),
       "utf-8"
