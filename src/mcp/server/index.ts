@@ -15,7 +15,9 @@ Discovery: ALWAYS call fireberry_apps_find_manifests with a workspace root befor
 
 Auth: tokens are stored locally by the human via 'fireberry init [--alias <name>]'. The LLM never sees raw tokens. Use fireberry_apps_list_profiles to discover available environments and fireberry_apps_switch_profile to switch.
 
-Each lifecycle tool takes an explicit manifestPath; the server has no implicit working directory.`;
+Each lifecycle tool takes an explicit manifestPath; the server has no implicit working directory.
+
+Errors: a failed tool returns isError with a JSON text payload { status: "error", code, message, fatal, hint?, details? }. When fatal is true (codes backend_unavailable, backend_error, auth_error), HALT the current multi-step workflow - do not attempt dependent steps (e.g. push -> install -> debug). For auth_error, ask the user to re-run 'fireberry init'. Non-fatal errors (e.g. invalid_path, manifest_not_found, confirmation_required, component_not_found) are caller-fixable: correct the input and retry.`;
 
 export function createServer(): McpServer {
   const server = new McpServer(

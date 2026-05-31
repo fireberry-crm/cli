@@ -1,6 +1,7 @@
 import "../config/env.js";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { getApiToken } from "./config.js";
+import { ApiError } from "./errors.js";
 import packageJson from "../../package.json" with { type: "json" };
 
 const getDefaultApiUrl = () => {
@@ -45,6 +46,58 @@ fbApi.interceptors.request.use(
   }
 );
 
+export function classifyApiError(error: unknown): ApiError {
+  if (axios.isAxiosError(error)) {
+    const status = error.response?.status;
+
+    // No HTTP response at all => transport-level failure (DNS, refused, timeout).
+    if (status === undefined) {
+      return new ApiError({
+        code: "backend_unavailable",
+        message: `Fireberry backend is unreachable (${
+          error.code ?? "network error"
+        }): ${error.message}`,
+        fatal: true,
+      });
+    }
+
+    if (status === 401 || status === 403) {
+      return new ApiError({
+        code: "auth_error",
+        message:
+          "Unauthorized: the Fireberry token is missing, invalid, or expired.",
+        fatal: true,
+        status,
+      });
+    }
+
+    if (status >= 500) {
+      return new ApiError({
+        code: "backend_error",
+        message: `Fireberry backend error (HTTP ${status}): ${
+          error.response?.data?.message || error.message
+        }`,
+        fatal: true,
+        status,
+      });
+    }
+
+    // Other 4xx: the request itself was rejected (often caller-fixable).
+    return new ApiError({
+      code: "backend_request_error",
+      message: error.response?.data?.message || error.message,
+      fatal: false,
+      status,
+    });
+  }
+
+  return new ApiError({
+    code: "backend_unavailable",
+    message: error instanceof Error ? error.message : "Unknown network error",
+    fatal: true,
+  });
+}
+
 export async function sendApiRequest<T = any>(
   config: AxiosRequestConfig
 ): Promise<T> {
@@ -53,25 +106,7 @@ export async function sendApiRequest<T = any>(
 
     return response.data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status;
-      let errorMessage:string;
-
-      switch (status) {
-        case 401:
-          console.log(error.response?.data?.message || error.message); // TODO: remove this
-          errorMessage = "Unauthorized user.";
-          break;
-        case 500:
-          errorMessage = "Internal server error.";
-          break;
-        default:
-          errorMessage = error.response?.data?.message || error.message;
-      }
-
-      throw new Error(`Error: ${errorMessage}`);
-    }
-    throw error;
+    throw classifyApiError(error);
   }
 }
 
