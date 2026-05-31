@@ -7,13 +7,14 @@
   "license": "MIT",
   "bin": {
     "fireberry": "dist/bin/fireberry.js",
-    "fireberry-apps-mcp": "fireberry-apps-mcp"
+    "fireberry-apps-mcp": "dist/bin/fireberry-apps-mcp.js"
   },
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "start": "node dist/bin/fireberry.js",
+    "mcp:start": "node dist/bin/fireberry-apps-mcp.js",
     "build": "tsc",
     "build:dev": "npm run clean && tsc && npm link && chmod +x dist/bin/fireberry.js dist/bin/fireberry-apps-mcp.js",
     "dev": "tsc --watch",
