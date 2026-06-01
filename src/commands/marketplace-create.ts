@@ -5,16 +5,16 @@ import { v4 as uuidv4 } from "uuid";
 import yaml from "js-yaml";
 import ora from "ora";
 import chalk from "chalk";
-import { createApp } from "../api/requests.js";
-import { getManifest } from "../utils/components.utils.js";
 import { slugifyName } from "../utils/app.utils.js";
 import { runCreateComponent } from "./create-component.js";
 
-interface CreateOptions {
+interface MarketplaceCreateOptions {
   name?: string;
 }
 
-export async function runCreate({ name }: CreateOptions): Promise<void> {
+export async function runMarketplaceCreate({
+  name,
+}: MarketplaceCreateOptions): Promise<void> {
   let appName = name;
 
   if (!appName) {
@@ -71,15 +71,10 @@ export async function runCreate({ name }: CreateOptions): Promise<void> {
     console.log(chalk.cyan(`\nAdding component "${componentName}"...`));
 
     await runCreateComponent({ name: componentName });
-    spinner.start();
-    spinner.text = `Registering app with Fireberry...`;
-    await createApp(await getManifest());
-    spinner.succeed(`App registered with Fireberry!`);
 
-    console.log(chalk.green(`\n🎉 Your app is ready!`));
+    console.log(chalk.green(`\n🎉 Your marketplace app is ready!`));
     console.log(chalk.white(`\nNext steps:`));
     console.log(chalk.white(`   cd ${slug}`));
-    console.log(chalk.white(`   fireberry push    # Push to Fireberry`));
   } catch (error) {
     spinner.fail(`Failed to create app "${chalk.cyan(appName)}"`);
     process.chdir(originalCwd);
