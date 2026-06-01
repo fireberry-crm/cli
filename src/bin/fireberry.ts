@@ -57,7 +57,7 @@ const marketplace = program
 marketplace
   .command("create")
   .argument("[name]", "App name")
-  .description("Create a new marketplace app locally (no server registration)")
+  .description("Create a new marketplace app")
   .action(async (name?: string) => {
     await runMarketplaceCreate({ name });
   });
