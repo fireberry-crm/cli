@@ -11,6 +11,7 @@ import { runDebug } from "../commands/debug.js";
 import { runCreateComponent } from "../commands/create-component.js";
 import { runDeploy } from "../commands/deploy.js";
 import { runMarketplaceCreate } from "../commands/marketplace-create.js";
+import { runMarketplaceDeploy } from "../commands/marketplace-deploy.js";
 
 const program = new Command();
 
@@ -60,6 +61,13 @@ marketplace
   .description("Create a new marketplace app")
   .action(async (name?: string) => {
     await runMarketplaceCreate({ name });
+  });
+
+marketplace
+  .command("deploy")
+  .description("Deploy app components to the Fireberry marketplace")
+  .action(async () => {
+    await runMarketplaceDeploy();
   });
 
 program

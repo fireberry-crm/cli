@@ -52,6 +52,19 @@ export const deployApp = async (appId: string): Promise<void> => {
   }
 };
 
+export const deployMarketplace = async (
+  components: ZippedComponent[],
+  manifest: Manifest,
+  icon?: Buffer
+): Promise<void> => {
+  const url = `${BASE_SERVICE_URL}/marketplace/deploy`;
+  try {
+    await api.post<void>(url, { components, manifest, icon });
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : "Unknown error");
+  }
+};
+
 export const updateDebug = async (
   componentId: string,
   manifest: Manifest,
