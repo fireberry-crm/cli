@@ -18,7 +18,6 @@ const IGNORED_PATHS = new Set(["node_modules"]);
 export async function runMarketplaceClone({
   dest,
 }: MarketplaceCloneOptions): Promise<void> {
-  // Must be run from the app root (where manifest.yml lives).
   const manifest = (await getManifest()) as Manifest;
 
   let destFolder = dest;
@@ -48,7 +47,6 @@ export async function runMarketplaceClone({
     );
   }
 
-  // Allow cloning into an existing empty folder; reject only if it has files.
   if (await fs.pathExists(destDir)) {
     const stats = await fs.stat(destDir);
     if (!stats.isDirectory()) {
@@ -76,7 +74,6 @@ export async function runMarketplaceClone({
       },
     });
 
-    // Regenerate ids for the cloned manifest (application + components).
     const appId = uuidv4();
     const clonedManifest: Manifest = {
       ...manifest,
@@ -108,7 +105,9 @@ export async function runMarketplaceClone({
     console.log(chalk.gray(`App ID: ${appId}`));
 
     console.log(chalk.green(`\n🎉 Your cloned marketplace app is ready!`));
-    console.log(chalk.white(`You can start working in ${chalk.cyan(folderName)}`));
+    console.log(
+      chalk.white(`You can start working in ${chalk.cyan(folderName)}`)
+    );
   } catch (error) {
     spinner.fail(`Failed to clone app into "${chalk.cyan(destFolder)}"`);
     throw error;
