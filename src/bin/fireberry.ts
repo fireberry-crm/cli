@@ -11,6 +11,7 @@ import { runDebug } from "../commands/debug.js";
 import { runCreateComponent } from "../commands/create-component.js";
 import { runDeploy } from "../commands/deploy.js";
 import { runMarketplaceCreate } from "../commands/marketplace-create.js";
+import { runMarketplaceClone } from "../commands/marketplace-clone.js";
 
 const program = new Command();
 
@@ -60,6 +61,14 @@ marketplace
   .description("Create a new marketplace app")
   .action(async (name?: string) => {
     await runMarketplaceCreate({ name });
+  });
+
+marketplace
+  .command("clone")
+  .argument("[dest-folder]", "Destination folder")
+  .description("Clone the current app into a new folder with new ids")
+  .action(async (dest?: string) => {
+    await runMarketplaceClone({ dest });
   });
 
 program
