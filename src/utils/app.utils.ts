@@ -4,6 +4,17 @@ import fs from "fs-extra";
 const VALID_ICON_EXTENSIONS = [".svg", ".png", ".jpg", ".jpeg"];
 const MAX_ICON_SIZE_BYTES = 500 * 1024;
 
+export const slugifyName = (name: string): string => {
+  const validPattern = /^[a-zA-Z0-9_-]+$/;
+  if (!validPattern.test(name)) {
+    throw new Error(
+      `Invalid app name: "${name}". Only alphanumeric characters, underscores, and hyphens are allowed.`
+    );
+  }
+
+  return name;
+};
+
 export const validateAndReadIcon = async (
   iconPath: string
 ): Promise<Buffer> => {
