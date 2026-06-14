@@ -69,7 +69,7 @@ marketplace
   .argument("[dest-folder]", "Destination folder")
   .description("Clone the current app into a new folder with new ids")
   .action(async (dest?: string) => {
-    await runMarketplaceClone({ dest });
+    await runMarketplaceClone({ dest })});
 
   marketplace.command("deploy")
   .description("Deploy app components to the Fireberry marketplace")
