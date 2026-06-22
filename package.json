@@ -24,6 +24,8 @@
     "test": "node test/smoke.test.js",
     "version:beta": "npm version prerelease --preid=beta",
     "publish:beta": "npm run version:beta && npm publish --tag beta",
+    "version:alpha": "npm version prerelease --preid=alpha",
+    "publish:alpha": "npm run version:alpha && npm publish --tag alpha",
     "publish:prod": "npm version patch && npm publish --tag latest"
   },
   "keywords": [
