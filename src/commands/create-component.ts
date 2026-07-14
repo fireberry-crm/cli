@@ -9,6 +9,12 @@ import chalk from "chalk";
 import yaml from "js-yaml";
 import { getManifest } from "../utils/components.utils.js";
 import { COMPONENT_TYPE, ComponentType } from "../constants/component-types.js";
+import {
+  DEFAULT_ICON_COLOR,
+  DEFAULT_ICON_NAME,
+  sanitizeComponentName,
+  selectAppTemplateFile,
+} from "../utils/component-scaffold.js";
 
 import { HEIGHT_OPTIONS } from "../constants/height-options.js";
 import { UntypedManifestComponent } from "../api/types.js";
@@ -21,13 +27,6 @@ interface CreateComponentOptions {
 }
 
 const VALID_COMPONENT_TYPES = Object.values(COMPONENT_TYPE);
-
-function sanitizeComponentName(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 function validateComponentType(type: string): ComponentType {
   if (!VALID_COMPONENT_TYPES.includes(type as ComponentType)) {
@@ -62,8 +61,8 @@ async function promptForSettings(
       ]);
       return {
         ...answers,
-        iconName: "related-single",
-        iconColor: "#7aae7f",
+        iconName: DEFAULT_ICON_NAME,
+        iconColor: DEFAULT_ICON_COLOR,
       };
     }
     case COMPONENT_TYPE.GLOBAL_MENU: {
@@ -77,7 +76,7 @@ async function promptForSettings(
       ]);
       return {
         ...answers,
-        iconName: "related-single",
+        iconName: DEFAULT_ICON_NAME,
       };
     }
     case COMPONENT_TYPE.SIDE_MENU: {
@@ -92,7 +91,7 @@ async function promptForSettings(
       ]);
       return {
         ...answers,
-        iconName: "related-single",
+        iconName: DEFAULT_ICON_NAME,
       };
     }
     default:
@@ -225,10 +224,7 @@ export async function runCreateComponent({
     const templatesDir = path.join(__dirname, "..", "..", "src", "templates");
 
     // Choose the right App.jsx template based on component type
-    const appTemplateFile =
-      validatedType === COMPONENT_TYPE.RECORD
-        ? "App-record.jsx"
-        : "App-other.jsx";
+    const appTemplateFile = selectAppTemplateFile(validatedType);
     const appTemplate = await fs.readFile(
       path.join(templatesDir, appTemplateFile),
       "utf-8"

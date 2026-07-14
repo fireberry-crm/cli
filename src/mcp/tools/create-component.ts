@@ -12,6 +12,12 @@ import type {
 } from "../../api/types.js";
 import { COMPONENT_TYPE } from "../../constants/component-types.js";
 import { HEIGHT_OPTIONS } from "../../constants/height-options.js";
+import {
+  DEFAULT_ICON_COLOR,
+  DEFAULT_ICON_NAME,
+  sanitizeComponentName,
+  selectAppTemplateFile,
+} from "../../utils/component-scaffold.js";
 import { createApp } from "../../api/requests.js";
 import {
   DomainError,
@@ -35,26 +41,19 @@ const HeightSchema = z.enum(HEIGHT_OPTIONS);
 const RecordSettingsSchema = z.object({
   objectType: z.number().int(),
   height: HeightSchema,
-  iconName: z.string().default("related-single"),
-  iconColor: z.string().default("#7aae7f"),
+  iconName: z.string().default(DEFAULT_ICON_NAME),
+  iconColor: z.string().default(DEFAULT_ICON_COLOR),
 });
 
 const GlobalMenuSettingsSchema = z.object({
   displayName: z.string().min(1),
-  iconName: z.string().default("related-single"),
+  iconName: z.string().default(DEFAULT_ICON_NAME),
 });
 
 const SideMenuSettingsSchema = z.object({
   width: WidthSchema,
-  iconName: z.string().default("related-single"),
+  iconName: z.string().default(DEFAULT_ICON_NAME),
 });
-
-function sanitizeComponentName(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 interface SpawnOutcome {
   exitCode: number | null;
@@ -358,8 +357,7 @@ export function registerCreateComponentTool(server: McpServer): void {
 
         const templatesDir = findTemplatesDir();
         if (templatesDir) {
-          const templateFile =
-            type === COMPONENT_TYPE.RECORD ? "App-record.jsx" : "App-other.jsx";
+          const templateFile = selectAppTemplateFile(type);
           const templatePath = path.join(templatesDir, templateFile);
           if (await fs.pathExists(templatePath)) {
             const tpl = await fs.readFile(templatePath, "utf-8");

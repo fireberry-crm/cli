@@ -56,7 +56,7 @@ export function classifyApiError(error: unknown): ApiError {
         code: "backend_unavailable",
         message: `Fireberry backend is unreachable (${
           error.code ?? "network error"
-        }): ${error.message}`,
+        }) — ${error.message}`,
         fatal: true,
       });
     }
@@ -65,7 +65,7 @@ export function classifyApiError(error: unknown): ApiError {
       return new ApiError({
         code: "auth_error",
         message:
-          "Unauthorized: the Fireberry token is missing, invalid, or expired.",
+          "Unauthorized — the Fireberry token is missing, invalid, or expired.",
         fatal: true,
         status,
       });
@@ -74,7 +74,7 @@ export function classifyApiError(error: unknown): ApiError {
     if (status >= 500) {
       return new ApiError({
         code: "backend_error",
-        message: `Fireberry backend error (HTTP ${status}): ${
+        message: `Fireberry backend error (HTTP ${status}) — ${
           error.response?.data?.message || error.message
         }`,
         fatal: true,
