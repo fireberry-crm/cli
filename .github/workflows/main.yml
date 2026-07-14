@@ -3,6 +3,14 @@ name: Publish Fireberry CLI to npm
 on:
   workflow_dispatch:
     inputs:
+      release_type:
+        description: "Release type (auto = detect from branch: dev->beta, main->production)"
+        required: false
+        type: choice
+        options:
+          - auto
+          - alpha
+        default: auto
       version:
         description: "Version bump type (ignored for beta/dev branch)"
         required: false
@@ -41,15 +49,20 @@ jobs:
         id: detect-type
         run: |
           BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          RELEASE_TYPE_INPUT="${{ github.event.inputs.release_type }}"
           echo "Branch: $BRANCH_NAME"
-          if [[ "$BRANCH_NAME" == "dev" ]]; then
+          echo "Release type input: $RELEASE_TYPE_INPUT"
+          if [[ "$RELEASE_TYPE_INPUT" == "alpha" ]]; then
+            echo "type=alpha" >> $GITHUB_OUTPUT
+            echo "Detected release type: alpha (manual selection)"
+          elif [[ "$BRANCH_NAME" == "dev" ]]; then
             echo "type=beta" >> $GITHUB_OUTPUT
             echo "Detected release type: beta"
           elif [[ "$BRANCH_NAME" == "main" ]]; then
             echo "type=production" >> $GITHUB_OUTPUT
             echo "Detected release type: production"
           else
-            echo "Error: Workflow must be run from 'dev' or 'main' branch"
+            echo "Error: Workflow must be run from 'dev' or 'main' branch (or select release_type=alpha)"
             echo "Current branch: $BRANCH_NAME"
             exit 1
           fi
@@ -67,6 +80,25 @@ jobs:
           else
             echo "Creating new beta version from production"
             npm version prepatch --preid=beta --no-git-tag-version
+          fi
+
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "New version: $NEW_VERSION"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Bump version (Alpha)
+        if: steps.detect-type.outputs.type == 'alpha'
+        id: version-alpha
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+
+          if [[ $CURRENT_VERSION == *"-alpha."* ]]; then
+            echo "Incrementing alpha prerelease version"
+            npm version prerelease --preid=alpha --no-git-tag-version
+          else
+            echo "Creating new alpha version from base"
+            npm version prepatch --preid=alpha --no-git-tag-version
           fi
 
           NEW_VERSION=$(node -p "require('./package.json').version")
@@ -98,7 +130,7 @@ jobs:
 
       - name: Commit version bump
         run: |
-          VERSION=${{ steps.version-beta.outputs.version || steps.version-prod.outputs.version }}
+          VERSION=${{ steps.version-beta.outputs.version || steps.version-alpha.outputs.version || steps.version-prod.outputs.version }}
           echo "Committing version: $VERSION"
 
           git config user.name "github-actions[bot]"
@@ -158,6 +190,16 @@ jobs:
           echo "Publishing beta version $VERSION to npm"
           npm publish --tag beta --provenance --access public
           echo "Successfully published @fireberry/cli@$VERSION (beta tag)"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to npm (Alpha)
+        if: steps.detect-type.outputs.type == 'alpha'
+        run: |
+          VERSION=${{ steps.version-alpha.outputs.version }}
+          echo "Publishing alpha version $VERSION to npm"
+          npm publish --tag alpha --provenance --access public
+          echo "Successfully published @fireberry/cli@$VERSION (alpha tag)"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
