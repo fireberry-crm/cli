@@ -25,7 +25,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Enable pushing commits and tags
+      contents: write # Enable pushing commits and tags
       id-token: write
     environment:
       name: npm
@@ -41,6 +41,9 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: "npm"
           cache-dependency-path: ${{ github.workspace }}/package-lock.json
+
+      - name: Upgrade npm to latest stable
+        run: npm install -g npm@11.5.1
 
       - name: Install dependencies
         run: npm ci
@@ -147,9 +150,6 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Update npm to latest version
-        run: npm install -g npm@latest
-
       - name: Push changes
         run: |
           echo "Pushing to branch: ${{ github.ref_name }}"
@@ -190,8 +190,6 @@ jobs:
           echo "Publishing beta version $VERSION to npm"
           npm publish --tag beta --provenance --access public
           echo "Successfully published @fireberry/cli@$VERSION (beta tag)"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm (Alpha)
         if: steps.detect-type.outputs.type == 'alpha'
@@ -200,8 +198,6 @@ jobs:
           echo "Publishing alpha version $VERSION to npm"
           npm publish --tag alpha --provenance --access public
           echo "Successfully published @fireberry/cli@$VERSION (alpha tag)"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm (Production)
         if: steps.detect-type.outputs.type == 'production'
@@ -210,5 +206,3 @@ jobs:
           echo "Publishing production version $VERSION to npm"
           npm publish --tag latest --provenance --access public
           echo "Successfully published @fireberry/cli@$VERSION (latest tag)"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

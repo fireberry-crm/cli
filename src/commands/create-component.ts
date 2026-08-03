@@ -10,10 +10,10 @@ import yaml from "js-yaml";
 import { getManifest } from "../utils/components.utils.js";
 import { COMPONENT_TYPE, ComponentType } from "../constants/component-types.js";
 import {
+  APP_TEMPLATE_FILE,
   DEFAULT_ICON_COLOR,
   DEFAULT_ICON_NAME,
   sanitizeComponentName,
-  selectAppTemplateFile,
 } from "../utils/component-scaffold.js";
 
 import { HEIGHT_OPTIONS } from "../constants/height-options.js";
@@ -174,7 +174,7 @@ export async function runCreateComponent({
     );
     spinner.start();
 
-    const componentDir = path.join(process.cwd(), componentName);
+    const componentDir = path.join(process.cwd(), sanitizedName);
     await fs.ensureDir(componentDir);
 
     spinner.text = `Running npm create vite@latest...`;
@@ -223,10 +223,8 @@ export async function runCreateComponent({
 
     const templatesDir = path.join(__dirname, "..", "..", "src", "templates");
 
-    // Choose the right App.jsx template based on component type
-    const appTemplateFile = selectAppTemplateFile(validatedType);
     const appTemplate = await fs.readFile(
-      path.join(templatesDir, appTemplateFile),
+      path.join(templatesDir, APP_TEMPLATE_FILE),
       "utf-8"
     );
     await fs.writeFile(path.join(componentDir, "src", "App.jsx"), appTemplate);
@@ -251,7 +249,7 @@ export async function runCreateComponent({
       type: validatedType,
       title: componentName,
       id: componentId,
-      path: `${componentName}/dist`,
+      path: `${sanitizedName}/dist`,
       settings: componentSettings,
     };
 

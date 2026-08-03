@@ -13,12 +13,12 @@ export const createApp = async (manifest: Manifest): Promise<void> => {
 };
 
 export const pushComponents = async (
-  appId: string,
   components: ZippedComponent[],
-  manifest: Manifest
+  manifest: Manifest,
+  icon?: Buffer
 ): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/push`;
-  await api.post<void>(url, { appId, components, manifest });
+  await api.post<void>(url, { components, manifest, icon });
 };
 
 export const installApp = async (manifest: Manifest): Promise<void> => {
@@ -29,6 +29,11 @@ export const installApp = async (manifest: Manifest): Promise<void> => {
 export const deleteApp = async (manifest: Manifest): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/delete`;
   await api.delete<void>(url, { manifest });
+};
+
+export const deployApp = async (appId: string): Promise<void> => {
+  const url = `${BASE_SERVICE_URL}/deploy`;
+  await api.post<void>(url, { appId });
 };
 
 export const updateDebug = async (

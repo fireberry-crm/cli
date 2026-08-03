@@ -5,6 +5,7 @@ import yaml from "js-yaml";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { pushComponents } from "../../api/requests.js";
 import { handleComponents } from "../../utils/components.utils.js";
+import { validateAndReadIcon } from "../../utils/app.utils.js";
 import type { Manifest } from "../../api/types.js";
 import { DomainError, toErrorResult, toSuccessResult } from "../lib/mcp-errors.js";
 import { makeLogger, type SendNotificationFn } from "../lib/logging.js";
@@ -81,7 +82,15 @@ export function registerPushTool(server: McpServer): void {
         });
 
         if (zipped.length > 0) {
-          await pushComponents(manifest.app.id, zipped, manifest);
+          // The manifest dir is the anchor for relative paths: the MCP server
+          // has no implicit working directory, so cwd cannot be trusted here.
+          let icon: Buffer | undefined;
+          if (manifest.app.icon) {
+            icon = await validateAndReadIcon(
+              path.resolve(basePath, manifest.app.icon)
+            );
+          }
+          await pushComponents(zipped, manifest, icon);
         }
 
         const pushedComponents = zipped.map((c) => ({

@@ -7,21 +7,11 @@ import ora from "ora";
 import chalk from "chalk";
 import { createApp } from "../api/requests.js";
 import { getManifest } from "../utils/components.utils.js";
+import { slugifyName } from "../utils/app.utils.js";
 import { runCreateComponent } from "./create-component.js";
 
 interface CreateOptions {
   name?: string;
-}
-
-function slugifyName(name: string) {
-  const validPattern = /^[a-zA-Z0-9_-]+$/;
-  if (!validPattern.test(name)) {
-    throw new Error(
-      `Invalid app name: "${name}". Only alphanumeric characters, underscores, and hyphens are allowed.`
-    );
-  }
-
-  return name;
 }
 
 export async function runCreate({ name }: CreateOptions): Promise<void> {
