@@ -30,10 +30,23 @@ program
 program
   .command("init")
   .argument("[tokenid]", "Fireberry token id")
+  .option("--alias <name>", "Save the token under a named profile (enables multi-environment)")
+  .option("--list", "List configured profiles and show which is active")
+  .option("--use <name>", "Switch the active profile to an existing alias")
   .description("Initiates credentials and stores token in local config")
-  .action(async (tokenid?: string) => {
-    await runInit({ tokenid });
-  });
+  .action(
+    async (
+      tokenid?: string,
+      options?: { alias?: string; list?: boolean; use?: string }
+    ) => {
+      await runInit({
+        tokenid,
+        alias: options?.alias,
+        list: options?.list,
+        use: options?.use,
+      });
+    }
+  );
 
 program
   .command("create")

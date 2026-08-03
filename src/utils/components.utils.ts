@@ -263,7 +263,10 @@ export const zipComponentBuild = async (
   }
 };
 
-export const validateManifestComponents = async (manifest: Manifest) => {
+export const validateManifestComponents = async (
+  manifest: Manifest,
+  basePath: string = process.cwd()
+) => {
   const components = manifest.components as unknown as
     | UntypedManifestComponent[]
     | undefined;
@@ -277,22 +280,23 @@ export const validateManifestComponents = async (manifest: Manifest) => {
   }
 
   for (const comp of components) {
-    const componentPath = path.join(process.cwd(), comp.path);
+    const componentPath = path.join(basePath, comp.path);
     await validateComponentBuild(componentPath, comp);
   }
 };
 
 export const handleComponents = async (
-  manifest: Manifest
+  manifest: Manifest,
+  basePath: string = process.cwd()
 ): Promise<ZippedComponent[]> => {
-  await validateManifestComponents(manifest);
+  await validateManifestComponents(manifest, basePath);
   const components =
     manifest.components as unknown as UntypedManifestComponent[];
 
   const zippedComponents: ZippedComponent[] = [];
 
   for (const comp of components) {
-    const componentPath = path.join(process.cwd(), comp.path);
+    const componentPath = path.join(basePath, comp.path);
 
     const buildBuffer = await zipComponentBuild(componentPath, comp.title);
 

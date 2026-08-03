@@ -3,13 +3,13 @@ import { BASE_SERVICE_URL } from "../constants/component-types.js";
 import { api } from "./axios.js";
 import type { Manifest, ZippedComponent } from "./types.js";
 
+// Note: api.* throws a typed ApiError (see ./errors.ts) on transport/HTTP
+// failures. We deliberately let it propagate unchanged so callers (CLI and MCP)
+// can read its `code`/`fatal` fields instead of a flattened generic Error.
+
 export const createApp = async (manifest: Manifest): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/create`;
-  try {
-    await api.post<void>(url, { manifest });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Unknown error");
-  }
+  await api.post<void>(url, { manifest });
 };
 
 export const pushComponents = async (
@@ -27,20 +27,12 @@ export const pushComponents = async (
 
 export const installApp = async (manifest: Manifest): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/install`;
-  try {
-    await api.post<void>(url, { manifest }, { timeout: 300000 }); // 5 minutes
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Unknown error");
-  }
+  await api.post<void>(url, { manifest }, { timeout: 300000 }); // 5 minutes
 };
 
 export const deleteApp = async (manifest: Manifest): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/delete`;
-  try {
-    await api.delete<void>(url, { manifest });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Unknown error");
-  }
+  await api.delete<void>(url, { manifest });
 };
 
 export const deployApp = async (appId: string): Promise<void> => {
@@ -71,9 +63,5 @@ export const updateDebug = async (
   debugUrl?: string
 ): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/debug`;
-  try {
-    await api.post<void>(url, { componentId, debugUrl, manifest });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Unknown error");
-  }
+  await api.post<void>(url, { componentId, debugUrl, manifest });
 };
