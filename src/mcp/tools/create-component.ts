@@ -13,10 +13,10 @@ import type {
 import { COMPONENT_TYPE } from "../../constants/component-types.js";
 import { HEIGHT_OPTIONS } from "../../constants/height-options.js";
 import {
+  APP_TEMPLATE_FILE,
   DEFAULT_ICON_COLOR,
   DEFAULT_ICON_NAME,
   sanitizeComponentName,
-  selectAppTemplateFile,
 } from "../../utils/component-scaffold.js";
 import { createApp } from "../../api/requests.js";
 import {
@@ -357,8 +357,7 @@ export function registerCreateComponentTool(server: McpServer): void {
 
         const templatesDir = findTemplatesDir();
         if (templatesDir) {
-          const templateFile = selectAppTemplateFile(type);
-          const templatePath = path.join(templatesDir, templateFile);
+          const templatePath = path.join(templatesDir, APP_TEMPLATE_FILE);
           if (await fs.pathExists(templatePath)) {
             const tpl = await fs.readFile(templatePath, "utf-8");
             await fs.writeFile(
@@ -366,7 +365,9 @@ export function registerCreateComponentTool(server: McpServer): void {
               tpl,
               "utf-8"
             );
-            await log.info("Applied App.jsx template", { templateFile });
+            await log.info("Applied App.jsx template", {
+              templateFile: APP_TEMPLATE_FILE,
+            });
           } else {
             await log.warning("Template file missing, skipping", {
               templatePath,

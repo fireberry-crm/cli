@@ -10,9 +10,6 @@ import { runDelete } from "../commands/delete.js";
 import { runDebug } from "../commands/debug.js";
 import { runCreateComponent } from "../commands/create-component.js";
 import { runDeploy } from "../commands/deploy.js";
-import { runMarketplaceCreate } from "../commands/marketplace-create.js";
-import { runMarketplaceClone } from "../commands/marketplace-clone.js";
-import { runMarketplaceDeploy } from "../commands/marketplace-deploy.js";
 
 const program = new Command();
 
@@ -64,31 +61,6 @@ program
   .action(async (name, type) => {
    await runCreateComponent({ name, type });
 });
-
-const marketplace = program
-  .command("marketplace")
-  .description("Marketplace commands");
-
-marketplace
-  .command("create")
-  .argument("[name]", "App name")
-  .description("Create a new marketplace app")
-  .action(async (name?: string) => {
-    await runMarketplaceCreate({ name });
-  });
-
-marketplace
-  .command("clone")
-  .argument("[dest-folder]", "Destination folder")
-  .description("Clone the current app into a new folder with new ids")
-  .action(async (dest?: string) => {
-    await runMarketplaceClone({ dest })});
-
-  marketplace.command("deploy")
-  .description("Deploy app components to the Fireberry marketplace")
-  .action(async () => {
-    await runMarketplaceDeploy();
-  });
 
 program
   .command("push")

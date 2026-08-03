@@ -18,11 +18,7 @@ export const pushComponents = async (
   icon?: Buffer
 ): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/push`;
-  try {
-    await api.post<void>(url, { components, manifest, icon });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Unknown error");
-  }
+  await api.post<void>(url, { components, manifest, icon });
 };
 
 export const installApp = async (manifest: Manifest): Promise<void> => {
@@ -37,24 +33,7 @@ export const deleteApp = async (manifest: Manifest): Promise<void> => {
 
 export const deployApp = async (appId: string): Promise<void> => {
   const url = `${BASE_SERVICE_URL}/deploy`;
-  try {
-    await api.post<void>(url, { appId });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Unknown error");
-  }
-};
-
-export const deployMarketplace = async (
-  components: ZippedComponent[],
-  manifest: Manifest,
-  icon?: Buffer
-): Promise<void> => {
-  const url = `${BASE_SERVICE_URL}/marketplace/deploy`;
-  try {
-    await api.post<void>(url, { components, manifest, icon });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Unknown error");
-  }
+  await api.post<void>(url, { appId });
 };
 
 export const updateDebug = async (
