@@ -198,8 +198,6 @@ jobs:
           echo "Publishing alpha version $VERSION to npm"
           npm publish --tag alpha --provenance --access public
           echo "Successfully published @fireberry/cli@$VERSION (alpha tag)"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm (Production)
         if: steps.detect-type.outputs.type == 'production'
