@@ -1,0 +1,52 @@
+import ora from "ora";
+import chalk from "chalk";
+import { getManifest, handleComponents } from "../utils/components.utils.js";
+import { validateAndReadIcon } from "../utils/app.utils.js";
+import { deployMarketplace } from "../api/requests.js";
+
+export async function runMarketplaceDeploy(): Promise<void> {
+  const spinner = ora("Checking manifest...").start();
+
+  try {
+    const manifest = await getManifest();
+    spinner.succeed("Manifest loaded successfully");
+
+    let icon: Buffer | undefined;
+
+    if (manifest.app.icon) {
+      spinner.start("Validating icon...");
+      icon = await validateAndReadIcon(manifest.app.icon);
+      const iconSizeKB = (icon.length / 1024).toFixed(2);
+      spinner.succeed(`Icon validated (${iconSizeKB} KB)`);
+    }
+
+    spinner.start("Validating and zipping components...");
+
+    const zippedComponents = await handleComponents(manifest);
+
+    const count = zippedComponents.length;
+    if (count > 0) {
+      spinner.succeed(
+        `${count} component${count > 1 ? "s" : ""} validated and zipped`
+      );
+
+      console.log(chalk.cyan("\nComponents ready to deploy:"));
+      zippedComponents.forEach((comp, idx) => {
+        const sizeKB = (comp.build.length / 1024).toFixed(2);
+        console.log(
+          chalk.gray(`  ${idx + 1}. ${comp.title} (${comp.id}) - ${sizeKB} KB`)
+        );
+      });
+
+      spinner.start("Deploying to marketplace...");
+
+      await deployMarketplace(zippedComponents, manifest, icon);
+      spinner.succeed("App deployed to marketplace successfully");
+    } else {
+      spinner.succeed("No components to deploy");
+    }
+  } catch (error) {
+    spinner.fail("Marketplace deploy failed");
+    throw error;
+  }
+}

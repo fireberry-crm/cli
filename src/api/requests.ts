@@ -36,6 +36,15 @@ export const deployApp = async (appId: string): Promise<void> => {
   await api.post<void>(url, { appId });
 };
 
+export const deployMarketplace = async (
+  components: ZippedComponent[],
+  manifest: Manifest,
+  icon?: Buffer
+): Promise<void> => {
+  const url = `${BASE_SERVICE_URL}/marketplace/deploy`;
+  await api.post<void>(url, { components, manifest, icon });
+};
+
 export const updateDebug = async (
   componentId: string,
   manifest: Manifest,
