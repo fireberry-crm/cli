@@ -83,3 +83,9 @@ export interface ZippedComponent {
   id: string;
   build: Buffer;
 }
+
+export interface ZippedComponentPayload {
+  title: string;
+  id: string;
+  build: string;
+}
