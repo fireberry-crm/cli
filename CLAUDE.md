@@ -37,11 +37,12 @@ Releases are managed through GitHub Actions workflow with automatic version mana
 **Beta Releases (from `dev` branch):**
 1. Go to GitHub Actions → "Publish Fireberry CLI to npm"
 2. Click "Run workflow" and select `dev` branch
-3. Workflow automatically:
+3. Optionally set `api_url` (defaults to `https://dev.fireberry.com/api/v3` for beta/alpha)
+4. Workflow automatically:
    - Increments beta version (e.g., 0.4.1-beta.0 → 0.4.1-beta.1)
    - Commits version change to git
    - Creates git tag (v0.4.1-beta.1)
-   - Builds and tests
+   - Bakes the API URL into `src/config/build-config.json`, builds and tests
    - Publishes to npm with `beta` tag
 
 **Production Releases (from `main` branch):**
@@ -49,11 +50,12 @@ Releases are managed through GitHub Actions workflow with automatic version mana
 2. Go to GitHub Actions → "Publish Fireberry CLI to npm"
 3. Click "Run workflow" and select `main` branch
 4. Choose version bump type (patch/minor/major)
-5. Workflow automatically:
+5. Optionally set `api_url` (defaults to `https://api.fireberry.com/api/v3` for production)
+6. Workflow automatically:
    - Removes `-beta` suffix and bumps version
    - Commits version change to git
    - Creates git tag (v0.4.1)
-   - Builds and tests
+   - Bakes the API URL into `src/config/build-config.json`, builds and tests
    - Publishes to npm with `latest` tag
 
 **Local Publishing (Emergency Hotfixes):**
@@ -67,6 +69,7 @@ npm run publish:prod  # Version bump (patch) and publish to npm with latest tag
 - Git tags automatically created for each release
 - Version consistency maintained between git and npm
 - `[skip ci]` in commit messages prevents workflow loops
+- The `api_url` workflow input controls which Fireberry server the published build talks to (never committed; only baked into the published artifact)
 
 ## Architecture
 
@@ -103,9 +106,11 @@ Each CLI command is in [src/commands/](src/commands/):
 ### API Layer ([src/api/](src/api/))
 
 - **axios.ts**: Axios instance with automatic token injection via interceptors
-- **API URL Logic**:
-  - Beta versions (version contains "beta") → Uses `FIREBERRY_STAGING_URL` environment variable
-  - Production versions → `FIREBERRY_API_URL` or `https://api.fireberry.com/api/v3`
+- **API URL Logic** (first match wins):
+  1. `FIREBERRY_API_URL` environment variable (local `.env` or shell) — runtime override
+  2. `apiUrl` in [src/config/build-config.json](src/config/build-config.json) — baked in at build time by the publish workflow (committed value is empty)
+  3. Beta versions (version contains "beta") → `FIREBERRY_STAGING_URL` or `https://dev.fireberry.com/api/v3`
+  4. Production versions → `https://api.fireberry.com/api/v3`
 - **Authentication**: Token passed via `tokenId` header (read from config in interceptor)
 - **requests.ts**: API endpoints (`createApp`, `pushComponents`, `installApp`, `deleteApp`)
 - **types.ts**: TypeScript interfaces for API requests/responses

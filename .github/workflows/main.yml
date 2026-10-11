@@ -20,6 +20,11 @@ on:
           - minor
           - major
         default: patch
+      api_url:
+        description: "Fireberry API URL baked into the build (empty = auto: beta/alpha -> https://dev.fireberry.com/api/v3, production -> https://api.fireberry.com/api/v3)"
+        required: false
+        type: string
+        default: ""
 
 jobs:
   publish:
@@ -144,6 +149,22 @@ jobs:
 
           echo "Created commit and tag v${VERSION}"
 
+      - name: Configure API URL
+        id: api-url
+        run: |
+          API_URL="${{ github.event.inputs.api_url }}"
+          if [[ -z "$API_URL" ]]; then
+            if [[ "${{ steps.detect-type.outputs.type }}" == "production" ]]; then
+              API_URL="https://api.fireberry.com/api/v3"
+            else
+              API_URL="https://dev.fireberry.com/api/v3"
+            fi
+          fi
+          echo "Baking API URL into build: $API_URL"
+          node -e "require('fs').writeFileSync('src/config/build-config.json', JSON.stringify({ apiUrl: process.argv[1] }, null, 2) + '\n')" "$API_URL"
+          cat src/config/build-config.json
+          echo "url=$API_URL" >> $GITHUB_OUTPUT
+
       - name: Build package
         run: npm run build --if-present
 
@@ -163,6 +184,9 @@ jobs:
           PROD_VERSION=${{ steps.version-prod.outputs.version }}
           echo "Syncing dev branch to ${PROD_VERSION}-beta.0"
 
+          # Stash the baked API URL so it doesn't block switching branches
+          git stash push -- src/config/build-config.json
+
           # Fetch latest dev branch
           git fetch origin dev
 
@@ -180,14 +204,15 @@ jobs:
 
           echo "Successfully synced dev branch to ${PROD_VERSION}-beta.0"
 
-          # Switch back to main branch
+          # Switch back to main branch and restore the baked API URL
           git checkout main
+          git stash pop
 
       - name: Publish to npm (Beta)
         if: steps.detect-type.outputs.type == 'beta'
         run: |
           VERSION=${{ steps.version-beta.outputs.version }}
-          echo "Publishing beta version $VERSION to npm"
+          echo "Publishing beta version $VERSION to npm (API URL: ${{ steps.api-url.outputs.url }})"
           npm publish --tag beta --provenance --access public
           echo "Successfully published @fireberry/cli@$VERSION (beta tag)"
 
@@ -195,7 +220,7 @@ jobs:
         if: steps.detect-type.outputs.type == 'alpha'
         run: |
           VERSION=${{ steps.version-alpha.outputs.version }}
-          echo "Publishing alpha version $VERSION to npm"
+          echo "Publishing alpha version $VERSION to npm (API URL: ${{ steps.api-url.outputs.url }})"
           npm publish --tag alpha --provenance --access public
           echo "Successfully published @fireberry/cli@$VERSION (alpha tag)"
 
@@ -203,6 +228,6 @@ jobs:
         if: steps.detect-type.outputs.type == 'production'
         run: |
           VERSION=${{ steps.version-prod.outputs.version }}
-          echo "Publishing production version $VERSION to npm"
+          echo "Publishing production version $VERSION to npm (API URL: ${{ steps.api-url.outputs.url }})"
           npm publish --tag latest --provenance --access public
           echo "Successfully published @fireberry/cli@$VERSION (latest tag)"
