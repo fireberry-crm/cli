@@ -160,9 +160,11 @@ jobs:
               API_URL="https://dev.fireberry.com/api/v3"
             fi
           fi
-          echo "Baking API URL into build: $API_URL"
-          node -e "require('fs').writeFileSync('src/config/build-config.json', JSON.stringify({ apiUrl: process.argv[1] }, null, 2) + '\n')" "$API_URL"
-          cat src/config/build-config.json
+          echo "API URL for this build: $API_URL"
+          # Exported for all following steps: the prebuild script bakes it into
+          # src/config/build-config.json during both `npm run build` and the
+          # `prepare` hook that `npm publish` runs.
+          echo "FIREBERRY_API_URL=$API_URL" >> $GITHUB_ENV
           echo "url=$API_URL" >> $GITHUB_OUTPUT
 
       - name: Build package

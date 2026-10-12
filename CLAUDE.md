@@ -64,6 +64,12 @@ npm run publish:beta  # Version bump (beta) and publish to npm with beta tag
 npm run publish:prod  # Version bump (patch) and publish to npm with latest tag
 ```
 
+**Installing from git with a custom API URL:**
+```bash
+FIREBERRY_API_URL=https://dev.fireberry.com/api/v3 npm install -g github:fireberry-crm/cli#dev
+```
+npm runs `prepare` (which builds) after cloning, so the env var is baked into the installed CLI.
+
 **Key Features:**
 - No manual version editing required
 - Git tags automatically created for each release
@@ -108,7 +114,7 @@ Each CLI command is in [src/commands/](src/commands/):
 - **axios.ts**: Axios instance with automatic token injection via interceptors
 - **API URL Logic** (first match wins):
   1. `FIREBERRY_API_URL` environment variable (local `.env` or shell) — runtime override
-  2. `apiUrl` in [src/config/build-config.json](src/config/build-config.json) — baked in at build time by the publish workflow (committed value is empty)
+  2. `apiUrl` in [src/config/build-config.json](src/config/build-config.json) — written by [scripts/write-build-config.mjs](scripts/write-build-config.mjs) during `prebuild` from the `FIREBERRY_API_URL` env var present at build time (committed value is empty)
   3. Beta versions (version contains "beta") → `FIREBERRY_STAGING_URL` or `https://dev.fireberry.com/api/v3`
   4. Production versions → `https://api.fireberry.com/api/v3`
 - **Authentication**: Token passed via `tokenId` header (read from config in interceptor)
