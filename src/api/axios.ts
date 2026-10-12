@@ -3,14 +3,22 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { getApiToken } from "./config.js";
 import { ApiError } from "./errors.js";
 import packageJson from "../../package.json" with { type: "json" };
+import buildConfig from "../config/build-config.json" with { type: "json" };
 
 const getDefaultApiUrl = () => {
+  // 1. Runtime override (local .env or shell environment)
   if (process.env.FIREBERRY_API_URL) {
     return process.env.FIREBERRY_API_URL;
   }
-  
+
+  // 2. URL baked in at build time by the publish pipeline
+  if (buildConfig.apiUrl) {
+    return buildConfig.apiUrl;
+  }
+
+  // 3. Fallback based on package version
   const isBeta = packageJson.version.includes("beta");
-  
+
   if (isBeta) {
     return process.env.FIREBERRY_STAGING_URL || "https://dev.fireberry.com/api/v3";
   }
