@@ -66,9 +66,12 @@ npm run publish:prod  # Version bump (patch) and publish to npm with latest tag
 
 **Installing from git with a custom API URL:**
 ```bash
-FIREBERRY_API_URL=https://dev.fireberry.com/api/v3 npm install -g github:fireberry-crm/cli#dev
+FIREBERRY_API_URL=https://dev.fireberry.com/api/v3 npm pack github:fireberry-crm/cli#dev
+npm install -g ./fireberry-cli-<version>.tgz
 ```
-npm runs `prepare` (which builds) after cloning, so the env var is baked into the installed CLI.
+`npm pack` clones the branch and runs `prepare` (which builds), so the env var is baked into the tarball.
+Do not use `npm install -g <git-url>` directly: npm's git preparation step inherits the global flag and
+builds without dependencies (fails with "Cannot find module" errors).
 
 **Key Features:**
 - No manual version editing required
