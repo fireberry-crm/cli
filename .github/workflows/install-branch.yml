@@ -1,0 +1,126 @@
+name: Build install branch
+
+# Builds the CLI from the selected branch with a baked-in Fireberry API URL and
+# pushes the prebuilt package (dist + package.json without build scripts) to an
+# `install/<branch>` branch. That branch can be installed directly from GitHub:
+#
+#   npm install -g github:fireberry-crm/cli#install/dev
+#
+# Why a prebuilt branch: `npm install -g <git-url>` on a source branch fails
+# because npm's git preparation step inherits the global flag and builds without
+# dependencies. A branch with no build scripts skips that step entirely.
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: "Fireberry API URL baked into the build"
+        required: false
+        type: string
+        default: "https://dev.fireberry.com/api/v3"
+      target_branch:
+        description: "Branch to push the prebuilt package to (empty = install/<source-branch>, slashes replaced with -)"
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  build-install-branch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: ${{ github.workspace }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve settings
+        id: settings
+        run: |
+          SOURCE_BRANCH="${GITHUB_REF#refs/heads/}"
+          TARGET_BRANCH="${{ github.event.inputs.target_branch }}"
+          if [[ -z "$TARGET_BRANCH" ]]; then
+            TARGET_BRANCH="install/${SOURCE_BRANCH//\//-}"
+          fi
+          API_URL="${{ github.event.inputs.api_url }}"
+          if [[ -z "$API_URL" ]]; then
+            API_URL="https://dev.fireberry.com/api/v3"
+          fi
+          echo "Source branch: $SOURCE_BRANCH"
+          echo "Target branch: $TARGET_BRANCH"
+          echo "API URL:       $API_URL"
+          echo "source_branch=$SOURCE_BRANCH" >> $GITHUB_OUTPUT
+          echo "target_branch=$TARGET_BRANCH" >> $GITHUB_OUTPUT
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+          # Picked up by scripts/write-build-config.mjs during prebuild
+          echo "FIREBERRY_API_URL=$API_URL" >> $GITHUB_ENV
+
+      - name: Build package
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+
+      - name: Strip build scripts from package.json
+        run: |
+          node -e '
+            const fs = require("fs");
+            const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            // Keep only runtime scripts so npm does not try to build on install
+            pkg.scripts = { start: pkg.scripts.start, "mcp:start": pkg.scripts["mcp:start"] };
+            delete pkg.devDependencies;
+            pkg.files = ["dist", "README.md"];
+            fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2) + "\n");
+          '
+          cat package.json
+
+      - name: Push prebuilt package to target branch
+        run: |
+          SOURCE_BRANCH="${{ steps.settings.outputs.source_branch }}"
+          TARGET_BRANCH="${{ steps.settings.outputs.target_branch }}"
+          API_URL="${{ steps.settings.outputs.api_url }}"
+          SOURCE_SHA="${GITHUB_SHA::7}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout --orphan "$TARGET_BRANCH"
+          git rm -rfq --cached .
+          git add -f package.json package-lock.json dist README.md
+          git commit -m "build: prebuilt @fireberry/cli from ${SOURCE_BRANCH}@${SOURCE_SHA}
+
+          API URL: ${API_URL}
+          Source:  ${SOURCE_BRANCH} (${GITHUB_SHA})
+          Built:   $(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+          Install with:
+            npm install -g github:${GITHUB_REPOSITORY}#${TARGET_BRANCH}"
+
+          git push --force origin "HEAD:refs/heads/${TARGET_BRANCH}"
+          echo "Pushed prebuilt package to ${TARGET_BRANCH}"
+
+      - name: Job summary
+        run: |
+          {
+            echo "## Prebuilt install branch ready"
+            echo
+            echo "- Source: \`${{ steps.settings.outputs.source_branch }}\` (\`${GITHUB_SHA::7}\`)"
+            echo "- Branch: \`${{ steps.settings.outputs.target_branch }}\`"
+            echo "- API URL: \`${{ steps.settings.outputs.api_url }}\`"
+            echo
+            echo "Install:"
+            echo
+            echo '```bash'
+            echo "npm install -g github:${GITHUB_REPOSITORY}#${{ steps.settings.outputs.target_branch }}"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY

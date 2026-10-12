@@ -64,14 +64,17 @@ npm run publish:beta  # Version bump (beta) and publish to npm with beta tag
 npm run publish:prod  # Version bump (patch) and publish to npm with latest tag
 ```
 
-**Installing from git with a custom API URL:**
-```bash
-FIREBERRY_API_URL=https://dev.fireberry.com/api/v3 npm pack github:fireberry-crm/cli#dev
-npm install -g ./fireberry-cli-<version>.tgz
-```
-`npm pack` clones the branch and runs `prepare` (which builds), so the env var is baked into the tarball.
-Do not use `npm install -g <git-url>` directly: npm's git preparation step inherits the global flag and
-builds without dependencies (fails with "Cannot find module" errors).
+**Installing from GitHub (prebuilt branch, no npm publish):**
+1. Go to GitHub Actions → "Build install branch", pick the source branch (e.g. `dev`)
+2. Optionally set `api_url` (default `https://dev.fireberry.com/api/v3`) and `target_branch` (default `install/<source-branch>`)
+3. The workflow builds with the baked URL, strips build scripts from package.json, and force-pushes `dist` + `package.json` to the target branch
+4. Install it anywhere with:
+   ```bash
+   npm install -g github:fireberry-crm/cli#install/dev
+   ```
+Do not `npm install -g` a *source* branch directly: npm's git preparation step inherits the global flag and
+builds without dependencies ("Cannot find module" errors). For a local one-off, `npm pack <git-url>` then
+`npm install -g ./fireberry-cli-<version>.tgz` works, since `pack` is not global.
 
 **Key Features:**
 - No manual version editing required
