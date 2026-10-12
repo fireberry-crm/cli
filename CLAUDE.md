@@ -45,6 +45,10 @@ Releases are managed through GitHub Actions workflow with automatic version mana
    - Bakes the API URL into `src/config/build-config.json`, builds and tests
    - Publishes to npm with `beta` tag
 
+**Beta from any other branch:** run the same workflow on that branch and set `release_type` to `beta`. The version
+is bumped and tagged on that branch and published under the npm `beta` tag. Note that beta versions share one
+sequence with `dev`, so if the number already exists on npm the publish step fails; use `alpha` to avoid collisions.
+
 **Production Releases (from `main` branch):**
 1. Merge `dev` → `main` after QA passes
 2. Go to GitHub Actions → "Publish Fireberry CLI to npm"

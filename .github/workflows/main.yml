@@ -4,11 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: "Release type (auto = detect from branch: dev->beta, main->production)"
+        description: "Release type (auto = detect from branch: dev->beta, main->production; beta/alpha = force that type from any branch)"
         required: false
         type: choice
         options:
           - auto
+          - beta
           - alpha
         default: auto
       version:
@@ -63,6 +64,9 @@ jobs:
           if [[ "$RELEASE_TYPE_INPUT" == "alpha" ]]; then
             echo "type=alpha" >> $GITHUB_OUTPUT
             echo "Detected release type: alpha (manual selection)"
+          elif [[ "$RELEASE_TYPE_INPUT" == "beta" ]]; then
+            echo "type=beta" >> $GITHUB_OUTPUT
+            echo "Detected release type: beta (manual selection)"
           elif [[ "$BRANCH_NAME" == "dev" ]]; then
             echo "type=beta" >> $GITHUB_OUTPUT
             echo "Detected release type: beta"
@@ -70,7 +74,7 @@ jobs:
             echo "type=production" >> $GITHUB_OUTPUT
             echo "Detected release type: production"
           else
-            echo "Error: Workflow must be run from 'dev' or 'main' branch (or select release_type=alpha)"
+            echo "Error: Workflow must be run from 'dev' or 'main' branch (or select release_type=beta/alpha)"
             echo "Current branch: $BRANCH_NAME"
             exit 1
           fi
